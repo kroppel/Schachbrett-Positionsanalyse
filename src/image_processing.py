@@ -1,4 +1,4 @@
-from cv2 import cvtColor, COLOR_BGR2GRAY, adaptiveThreshold, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, line, HoughLines, circle
+from cv2 import cvtColor, COLOR_BGR2GRAY, adaptiveThreshold, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, line, HoughLines, circle, resize, INTER_LINEAR
 import numpy as np
 
 def preprocessing(img):
@@ -9,9 +9,15 @@ def preprocessing(img):
     return img_threshold
 
 
+def resize_image(img, factor):
+    return resize(img, (int(img.shape[1]*factor), int(img.shape[0]*factor)), interpolation = INTER_LINEAR)
+
 # Draws the given lines onto a copy of the given image
 # and returns it
 def draw_lines(img, lines):
+    if lines is None:
+        return img
+
     img_lines = np.copy(img)
 
     for dline in lines:
@@ -29,6 +35,9 @@ def draw_lines(img, lines):
     return img_lines
 
 def draw_points(img, points):
+    if points is None:
+        return img
+
     img_points = np.copy(img)
 
     for point in points:
