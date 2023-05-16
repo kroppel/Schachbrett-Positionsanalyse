@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3edb3ae5-0c86-4b4f-9760-c1efb62fa7d3" name="Changes" comment="GUI, Züge (teilweise schon mit Überprüfung)">
-      <change afterPath="$PROJECT_DIR$/src/Backend/VidIn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Backend/image_processing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +80,7 @@
       <workItem from="1684145357258" duration="1645000" />
       <workItem from="1684161463393" duration="3795000" />
       <workItem from="1684233957314" duration="3966000" />
+      <workItem from="1684253806887" duration="492000" />
     </task>
     <task id="LOCAL-00001" summary="GUI, Züge (teilweise schon mit Überprüfung)">
       <created>1684144485872</created>
@@ -99,7 +96,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684144700172</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="GUI, Züge (teilweise schon mit Überprüfung)">
+      <created>1684253829767</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1684253829767</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
