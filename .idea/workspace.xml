@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3edb3ae5-0c86-4b4f-9760-c1efb62fa7d3" name="Changes" comment="GUI">
+      <change beforePath="$PROJECT_DIR$/.idea/Schachbrett-Positionsanalyse.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,7 +88,7 @@
       <workItem from="1684145357258" duration="1645000" />
       <workItem from="1684161463393" duration="3795000" />
       <workItem from="1684233957314" duration="3966000" />
-      <workItem from="1684253806887" duration="1094000" />
+      <workItem from="1684253806887" duration="1479000" />
     </task>
     <task id="LOCAL-00001" summary="GUI, Züge (teilweise schon mit Überprüfung)">
       <created>1684144485872</created>
