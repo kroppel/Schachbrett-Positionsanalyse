@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from src.Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image
+from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image
 import sys
 from time import sleep
 import threading as th
@@ -27,14 +27,16 @@ class VidIn:
             print("yeah")
             self.pts1 = np.float32(self.pts1)
             self.pts2 = np.float32([[0, 0], [800, 0], [0, 800], [800, 800]])
+            self.M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
+
             cv2.destroyAllWindows()
 
     def get_frame(self):
         if self.vid.isOpened():
             ret, img = self.vid.read()
+            img = resize_image(img, 1.5)
 
-            M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
-            img = cv2.warpPerspective(img, M, (800, 800))
+            img = cv2.warpPerspective(img, self.M, (800, 800))
             img_threshold = preprocessing(img)
 
             h_lines, v_lines = filter_lines(extract_lines(img_threshold))

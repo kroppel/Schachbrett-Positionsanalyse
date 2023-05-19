@@ -1,10 +1,10 @@
 import tkinter as tk
 import os
 from PIL import ImageTk, Image
-from src.Frontend.clickEvent import ClickEvent
-import src.Backend.Figuren as fig
-import src.Backend.Convert as con
-import src.Backend.VidIn as vi
+from Frontend.clickEvent import ClickEvent
+import Backend.Figuren as fig
+import Backend.Convert as con
+import Backend.VidIn as vi
 import threading as th
 import cv2
 from time import sleep
@@ -97,7 +97,7 @@ class GUI:
 
         if ret:
             frame = Image.fromarray(frame)
-            #frame = frame.resize((440, 440), Image.ANTIALIAS)   # muss noch umgeändert werden
+            frame = frame.resize((440, 440), Image.ANTIALIAS)   # muss noch umgeändert werden
             self.photo = ImageTk.PhotoImage(image=frame)
             self.canvas_vidin.create_image(0, 0, image=self.photo, anchor=tk.NW)
             self.root.after(15, self.update())

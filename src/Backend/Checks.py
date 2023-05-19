@@ -1,5 +1,5 @@
-import src.Backend.Convert as conv
-import src.Backend.Figuren as fig
+import Backend.Convert as conv
+import Backend.Figuren as fig
 
 
 class Checks:
