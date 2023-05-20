@@ -32,6 +32,7 @@ class VidIn:
     def get_frame(self):
         if self.vid.isOpened():
             ret, img = self.vid.read()
+            img = resize_image(img, 1.5)
 
             M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
             img = cv2.warpPerspective(img, M, (800, 800))

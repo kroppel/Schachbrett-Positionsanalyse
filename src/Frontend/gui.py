@@ -97,7 +97,7 @@ class GUI:
 
         if ret:
             frame = Image.fromarray(frame)
-            #frame = frame.resize((440, 440), Image.ANTIALIAS)   # muss noch umgeändert werden
+            frame = frame.resize((440, 440), Image.ANTIALIAS)   # muss noch umgeändert werden
             self.photo = ImageTk.PhotoImage(image=frame)
             self.canvas_vidin.create_image(0, 0, image=self.photo, anchor=tk.NW)
             self.root.after(15, self.update())
