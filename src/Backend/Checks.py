@@ -36,35 +36,64 @@ class Checks:
         if self.saveid < 16:
             # wenn größer 8 dann sind es Bauern die zwei Werte mehr benötigen
             if 8 < self.save_figure_num:
-                answer = self.figures_white[self.save_figure_num].Zug(
+                answer, arr = self.figures_white[self.save_figure_num].Zug(
                     self.posX, self.posY, schlagen, "white"
                 )
             else:
-                answer = self.figures_white[self.save_figure_num].Zug(self.posX, self.posY)
+                answer, arr = self.figures_white[self.save_figure_num].Zug(self.posX, self.posY)
         else:
             if 8 > self.save_figure_num:
-                answer = self.figures_black[self.save_figure_num].Zug(
+                answer, arr = self.figures_black[self.save_figure_num].Zug(
                     self.posX, self.posY, schlagen, "black"
                 )
             else:
-                answer = self.figures_black[self.save_figure_num].Zug(self.posX, self.posY)
-        return answer
+                answer, arr = self.figures_black[self.save_figure_num].Zug(self.posX, self.posY)
+
+        # gibt erst einen bool wert zurück, dann gibt es 3 Optionen:
+        # 1. wenn answer = False, dann soll auch hier sofort false ausgegeben werden
+        if not answer:
+            return False
+        # 2. Wenn answer = True, dann gibt es ein array was mitgegeben wird,
+        # 2.1 Wenn dieses array leer ist, dann handelt es sich um den König, den Bauern oder das Pferd, welche nur 1 Feld Züge
+        # machen können oder über Figuren Springen dürfen, dann ist die Rückgabe True
+        elif answer & (len(arr) == 0):
+            return True
+        # 2.2 Ansonsten handelt es sich um einen größeren Zug, bei dem Figuren dazwischen stehen könnten
+        # bis auf die erste und letze Stelle soll dieses überprüft werden, ob es ein Feld gibt, auf dem eine Figur steht
+        else:
+            print(arr)
+            bool = True
+            # gehe das ganze Array durch,
+            for i in range(1, len(arr)):
+                # checke bei jeder Position, ob eine Figur darauf steht:
+                pos = (arr[i][0], arr[i][1])
+                print(arr[i])
+                if (self.checkLists(pos, False)):
+                    bool = False
+            return bool
 
     # geht die Liste durch und schaut, ob für die Position eine Figur erkannt wurde
-    def checkLists(self):
+    def checkLists(self, Position, Bool):
         # gehe die Listen durch
         for i in range(0, 16):
             # wenn du eine Figure mit der gleichen Position findest
-            if (self.figures_black[i].getPos() == self.Position) & (self.figures_black[i].getActive() is True):
-                self.id = self.figures_black[i].getID()
-                self.figure_num = i
-                print("Schwarze Figur erkannt", self.id)
-                break
-            if (self.figures_white[i].getPos() == self.Position) & (self.figures_white[i].getActive() is True):
-                self.id = self.figures_white[i].getID()
-                self.figure_num = i
-                print("Weiße Figur erkannt", self.id)
-                break
+            if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
+                if Bool:
+                    self.id = self.figures_black[i].getID()
+                    self.figure_num = i
+                    print("Schwarze Figur erkannt", self.id)
+                else:
+                    print("Figur erkannt")
+                return True
+            if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
+                if Bool:
+                    self.id = self.figures_white[i].getID()
+                    self.figure_num = i
+                    print("Weiße Figur erkannt", self.id)
+                else:
+                    print("Figur erkannt")
+                return True
+        return False
 
     def checkFigure(self, x, y, gui):
         self.id = None
@@ -76,7 +105,7 @@ class Checks:
         self.posX, self.posY = self.Position
 
         # schaue, ob auf der Position eine Figur steht
-        self.checkLists()
+        self.checkLists(self.Position, True)
 
         # Es folgt das Unterscheiden in 3 mögliche Fälle
         ################################################################################################################

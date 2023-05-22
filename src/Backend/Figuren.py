@@ -6,6 +6,25 @@ class Figuren:
         self.posY = y
         self.active = True
         self.value = value
+        self.i = 0
+
+    def countUp(self, x1, x2):
+        arr = []
+        for i in range(x1, x2):
+            arr.append(i)
+        return arr
+
+    def countDown(self, x1, x2):
+        arr = []
+        for i in range(x1, x2 - 1, -1):
+            arr.append(i)
+        return arr
+
+    def merge(self, xs, ys):
+        arr = []
+        for i in range(0, len(xs)):
+            arr.append([xs[i], ys[i]])
+        return arr
 
     def printAll(self, x, y):
         print("############\nFigur: ", self.id, "\n", self.posX, self.posY, x, y)
@@ -88,7 +107,7 @@ class King(Figuren):
     def Zug(self, x, y):
         self.printAll(x, y)
         if (0 <= abs(self.posX - x) <= 1) | (0 <= abs(self.posY - y) <= 1):
-            return True
+            return True, [x, y]
         return False
 
 
@@ -99,10 +118,39 @@ class Queen(Figuren):
     # Königin setzt sich aus Bishop or Rook zusammen
     def Zug(self, x, y):
         self.printAll(x, y)
-        if (abs(self.posX - x) == (abs(self.posY - y))) | (
-            ((self.posX == x) & (self.posY != y)) | ((self.posX != x) & (self.posY == y))):
-            return True
-        return False
+        # 1. bewegt sie sich wie ein Bishop:
+        if abs(self.posX - x) == (abs(self.posY - y)):
+            if self.posX < x:
+                xs = self.countUp(self.posX, x)
+            else:
+                xs = self.countDown(self.posX, x)
+            if self.posY < y:
+                ys = self.countUp(self.posY, y)
+            else:
+                ys = self.countDown(self.posY, y)
+            return True, self.merge(xs, ys)
+        # 2. bewegt sie sich wie ein Rook
+        elif (self.posX == x) & (self.posY != y):
+            xs = []
+            if self.posY < y:
+                ys = self.countUp(self.posY, y)
+            else:
+                ys = self.countDown(self.posY, y)
+            for i in range(0, len(ys)):
+                xs.append(x)
+            return True, self.merge(xs, ys)
+        # bewegt sich horizontal
+        elif (self.posX != x) & (self.posY == y):
+            ys = []
+            if self.posY < y:
+                xs = self.countUp(self.posY, y)
+            else:
+                xs = self.countDown(self.posY, y)
+            for i in range(0, len(xs)):
+                ys.append(x)
+            return True, self.merge(xs, ys)
+        else:
+            return False, []
 
 
 class Rook(Figuren):
@@ -112,21 +160,43 @@ class Rook(Figuren):
     # Turm darf nur horizontal oder vertikal bewegt werden
     def Zug(self, x, y):
         self.printAll(x, y)
-        if ((self.posX == x) & (self.posY != y)) | ((self.posX != x) & (self.posY == y)):
-            return True
-        return False
+        # bewegt sich vertikal
+        if (self.posX == x) & (self.posY != y):
+            xs = []
+            if self.posY < y:
+                ys = self.countUp(self.posY, y)
+            else:
+                ys = self.countDown(self.posY, y)
+            for i in range(0, len(ys)):
+                xs.append(x)
+            return True, self.merge(xs, ys)
+        # bewegt sich horizontal
+        elif (self.posX != x) & (self.posY == y):
+            ys = []
+            if self.posX < x:
+                xs = self.countUp(self.posY, y)
+            else:
+                xs = self.countDown(self.posY, y)
+            for i in range(0, len(xs)):
+                ys.append(x)
+            return True, self.merge(xs, ys)
+        # ansonsten kein gültiger Zug
+        else:
+            return False, []
 
 
 class Knight(Figuren):
     def __init__(self, id, seite, posx, posy, value):
         super().__init__(id, seite, posx, posy, value)
 
+    # bem Pferd müssen wir nicht auf dazwischen stehende Figuren überprüfen,
+    # denn diese können alle anderen überspringen
     def Zug(self, x, y):
         self.printAll(x, y)
         if ((abs(self.posX - x) == 1) & (abs(self.posY - y) == 2)) | (
                 ((abs(self.posX - x)) == 2) & (abs(self.posY - y) == 1)):
-            return True
-        return False
+            return True, []
+        return False, []
 
 
 class Bishop(Figuren):
@@ -136,36 +206,61 @@ class Bishop(Figuren):
     # darf sich nur auf der Diagonalen Bewegen
     def Zug(self, x, y):
         self.printAll(x, y)
+        # lassen erst überprüfen, ob der Zug überhaupt möglich wäre:
         if abs(self.posX - x) == abs(self.posY - y):
-            return True
-        return False
-
+            # wenn ja geben wir True und das Array mit allen dazwischen liegenden pos zurück
+            if self.posX < x:
+                xs = self.countUp(self.posX, x)
+            else:
+                xs = self.countDown(self.posX, x)
+            if  self.posY < y:
+                ys = self.countUp(self.posY, y)
+            else:
+                ys = self.countDown(self.posY, y)
+            return True, self.merge(xs, ys)
+        else:
+            # ansonsten False und ein leeres Array
+            return False, []
 
 class Pawn(Figuren):
     def __init__(self, id, seite, posx, posy, value):
         super().__init__(id, seite, posx, posy, value)
         self.moved = False
 
-    # wenn er schlagen will, muss er +1 +1, wenn nicht einfach 0 +1
-    # jedoch abhängig von den Seiten wo er hin darf -->
     def Zug(self, x, y, schlagen, Seite):
         self.printAll(x, y)
+        xs = []
+        # abhängig von der Seite muss er ein/zwei Felder nach unten oder oben
         if Seite == "white":
+            # wenn er schlagen will, muss er schräg gehen
             if schlagen & ((abs(self.posX - x)) == 1) & (self.posY - y == -1):
                 self.moved = True
-                return True
+                return True, []
+            # ansonsten darf er, wenn er noch nicht gerückt wurde einen zweier Sprung machen,
+            # aber auch nur, wenn keine andere Figur dazwischen steht
             elif ((not schlagen) & (not self.moved)) & ((self.posX == x) & ((self.posY - y == -2) | (self.posY - y == -1))):
                 self.moved = True
-                return True
+                # posY ist kleier als y
+                ys = self.countUp(self.posY, y)
+                for i in range(0, len(ys)):
+                    xs.append(x)
+                return True, self.merge(xs, ys)
+            # ansonsten darf er immer nur einen nach vorn Rücken
             elif (not schlagen) & (self.posX == x) & (self.posY - y == -1):
-                return True
+                return True, []
+        # andere Seite
         if Seite == "black":
+
             if schlagen & ((abs(self.posX - x)) == 1) & (self.posY - y == 1):
                 self.moved = True
                 return True
             elif ((not schlagen) & (not self.moved)) & ((self.posX == x) & ((self.posY - y == 2)|(self.posY - y == 1))):
                 self.moved = True
-                return True
+                # posY ist größer als y
+                ys = self.countDown(self.posY, y)
+                for i in range(0, len(ys)):
+                    xs.append(x)
+                return True, self.merge(xs, ys)
             elif ((not schlagen) & (self.posX == x)) & (self.posY - y == 1):
                 return True
         return False
