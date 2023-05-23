@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image
+from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields
 import sys
 from time import sleep
 import threading as th
@@ -34,20 +34,34 @@ class VidIn:
     def get_frame(self):
         if self.vid.isOpened():
             ret, img = self.vid.read()
-            img = resize_image(img, 1.5)
-
-            img = cv2.warpPerspective(img, self.M, (800, 800))
-            img_threshold = preprocessing(img)
-
-            h_lines, v_lines = filter_lines(extract_lines(img_threshold))
-            intersections = get_intersections(h_lines, v_lines)
-            if not intersections is None:
-                intersections = [tuple(map(int, point)) for point in list(intersections.flatten())]
-
-            img_display = draw_points(draw_lines(img, h_lines + v_lines), intersections)
 
             if ret:
-                return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
+                img = resize_image(img, 1.5)
+
+                img = cv2.warpPerspective(img, self.M, (800, 800))
+                img_threshold = preprocessing(img)
+
+                h_lines, v_lines = filter_lines(extract_lines(img_threshold))
+
+                if not h_lines is None and not v_lines is None:
+                    intersections = get_intersections(h_lines, v_lines)
+                    if not intersections is None:
+                        img_display = draw_lines(img, h_lines + v_lines)
+
+                        fields = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
+                        for i in np.arange(fields.shape[0]):
+                            for j in np.arange(fields.shape[1]):
+                                fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
+                        print(get_figures_in_fields(fields))
+
+                        return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
+
+                    return ret, cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+                else:
+                    return ret, img
+            
+
             else:
                 return ret, None
 
