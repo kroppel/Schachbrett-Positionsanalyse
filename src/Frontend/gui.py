@@ -22,21 +22,27 @@ class GUI:
 
         self.root = tk.Tk()
         self.root.title("Schachpositionsanalyse")
-        self.root.geometry("1300x800")
+        self.root.geometry("1300x850")
 
         start_text = tk.Label(self.root)
         start_text["text"] = "Schachspiel mit Positionsanalyse"
         start_text["font"] = "Arial 30 underline"
         start_text.place(x=430, y=0, height=100, width=450)
 
-        self.canvas = tk.Canvas(self.root, bg="black", width=440, height=440)
+        self.canvas = tk.Canvas(self.root, bg="black", width=438, height=438, highlightthickness=2, highlightbackground="black")
         self.canvas.place(x=100, y=200)
+
+        self.output_text = tk.Label(self.root)
+        self.output_text.config(
+             text="Output", font="Arial, 18", borderwidth=2, relief="ridge"
+        )
+        self.output_text.place(x=100, y=720, height=80, width=450)
 
         self.canvas_trenn = tk.Canvas(self.root, bg=None, width=20, height=600)
         self.canvas_trenn.place(x=640, y=150)
 
         # Fenster mit Video Input
-        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=440, height=440)
+        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
         self.canvas_vidin.place(x=740, y=200)
         self.vid = vi.VidIn()
         th.Thread(target=lambda: self.update()).start()
@@ -44,7 +50,7 @@ class GUI:
         # Erstellen des Schachbretthintergrundes
         background = Image.open(self.abs_path+"Chessboard.png")
         background_img = ImageTk.PhotoImage(background)
-        self.canvas.create_image(223, 223, image=background_img)
+        self.canvas.create_image(222, 222, image=background_img)
 
         # Erstellen der Figuren
         self.createImgs()
@@ -91,6 +97,15 @@ class GUI:
 
         # Mainloop starten
         self.root.mainloop()
+
+    def changeOutput(self, string):
+        self.output_text.config(text=string)
+
+    def ErrorOn(self):
+        self.canvas.config(highlightbackground="red")
+
+    def ErrorOff(self):
+        self.canvas.config(highlightbackground="black")
 
     def update(self):
         ret, frame = self.vid.get_frame()
