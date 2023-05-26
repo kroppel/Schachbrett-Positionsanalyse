@@ -52,7 +52,8 @@ class VidIn:
                         for i in np.arange(fields.shape[0]):
                             for j in np.arange(fields.shape[1]):
                                 fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
-                        print(get_figures_in_fields(fields))
+                        figs = get_figures_in_fields(fields)
+                        print(figs)
 
                         return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
 
@@ -61,9 +62,8 @@ class VidIn:
                 else:
                     return ret, img
             
-
             else:
-                return ret, None
+                return ret, cv2.cvtColor(np.zeros((800,800)), cv2.COLOR_BGR2RGB)
 
     def get_points(self, event, x, y, flags, points):
         if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
