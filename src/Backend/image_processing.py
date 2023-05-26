@@ -175,13 +175,13 @@ def detect_figure_in_field(field):
     # field edge pruning
     field = field[n:field.shape[0]-n, n:field.shape[1]-n]
 
-    pixel_sum = np.add.reduce(field, None)
-    #print(pixel_sum)
+    pixel_sum = int(np.add.reduce(field, None)/255)
+    """print("Pixel sum: {0} | Threshold: {1}".format(pixel_sum, field.shape[0]*field.shape[1]/12))
 
-    #cv2.imshow("Field", field)
-    #k = cv2.waitKey(0)
+    cv2.imshow("Field", field)
+    k = cv2.waitKey(0)"""
 
-    if (pixel_sum > field.shape[0]*field.shape[1])/2:
+    if (pixel_sum > field.shape[0]*field.shape[1]/12):
         return True
 
     return False
