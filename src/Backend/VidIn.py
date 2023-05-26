@@ -26,6 +26,14 @@ class VidIn:
                     break
             print("yeah")
             self.pts1 = np.float32(self.pts1)
+            # sortieren nach x koordinate
+            self.pts1 = self.pts1[np.argsort(self.pts1[:,0]),:]
+            points_left = self.pts1[0:2]
+            points_right = self.pts1[2:4]
+            # sortieren nach y koordinate
+            points_left = points_left[np.argsort(points_left[:,1]),:]
+            points_right = points_right[np.argsort(points_right[:,1]),:]
+            self.pts1 = np.asarray([points_left[0], points_right[0], points_left[1], points_right[1]])
             self.pts2 = np.float32([[0, 0], [800, 0], [0, 800], [800, 800]])
             self.M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
 
