@@ -1,4 +1,4 @@
-import src.Backend.Checks as ch
+import Backend.Checks as ch
 class ClickEvent:
     def __init__(self, gui):
         self.check = ch.Checks()

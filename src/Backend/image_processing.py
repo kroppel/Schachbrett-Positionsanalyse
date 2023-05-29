@@ -104,7 +104,7 @@ def filter_lines(lines):
         rhos = []
         rho_deviation_sum = 0
 
-        # Parameter for maximal value of the rho devation sum for the processed set of lines to be counted as sudoku lines
+        # Parameter for maximal value of the rho devation sum for the processed set of lines to be counted as chess lines
         deviation_max = 100
 
         for line in lines:
@@ -127,6 +127,9 @@ def filter_lines(lines):
             return []
 
         return chess_lines
+    
+    if lines is None:
+        return None, None
 
     # Keep horizontal/vertical lines
     horizontal_lines, vertical_lines = get_horizontal_and_vertical_lines(lines)
@@ -166,3 +169,32 @@ def get_intersections(h_lines, v_lines):
             intersections[i,j] = (x_i, y_i)
 
     return intersections
+
+def detect_figure_in_field(field):
+    n = 10
+    # field edge pruning
+    field = field[n:field.shape[0]-n, n:field.shape[1]-n]
+
+    pixel_sum = int(np.add.reduce(field, None)/255)
+    """print("Pixel sum: {0} | Threshold: {1}".format(pixel_sum, field.shape[0]*field.shape[1]/12))
+
+    cv2.imshow("Field", field)
+    k = cv2.waitKey(0)"""
+
+    if (pixel_sum > field.shape[0]*field.shape[1]/12):
+        return True
+
+    return False
+
+
+def get_figures_in_fields(fields):
+    figures = np.zeros_like(fields)
+
+    for i in np.arange(fields.shape[0]):
+        for j in np.arange(fields.shape[1]):
+            field = fields[i,j]
+            if detect_figure_in_field(field):
+                figures[i,j] = 1
+    
+    return figures
+
