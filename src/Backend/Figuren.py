@@ -10,7 +10,7 @@ class Figuren:
 
     def countUp(self, x1, x2):
         arr = []
-        for i in range(x1, x2):
+        for i in range(x1, x2+1):
             arr.append(i)
         return arr
 
@@ -21,6 +21,7 @@ class Figuren:
         return arr
 
     def merge(self, xs, ys):
+        print(xs, ys)
         arr = []
         for i in range(0, len(xs)):
             arr.append([xs[i], ys[i]])
@@ -107,7 +108,7 @@ class King(Figuren):
     def Zug(self, x, y) -> bool | list:
         self.printAll(x, y)
         if (0 <= abs(self.posX - x) <= 1) | (0 <= abs(self.posY - y) <= 1):
-            return True, [x, y]
+            return True, []
         else:
             return False, []
 
@@ -222,6 +223,7 @@ class Bishop(Figuren):
         else:
             # ansonsten False und ein leeres Array
             return False, []
+
 
 class Pawn(Figuren):
     def __init__(self, id, seite, posx, posy, value):

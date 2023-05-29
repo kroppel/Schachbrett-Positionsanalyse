@@ -118,6 +118,21 @@ class Checks:
                     self.figures_black[self.save_figure_num].moved()
             return bool
 
+    # gibt für das Backtracking die ID zurück und ändert die Position
+    def returnID(self, Position, newPos):
+        for i in range(0, 16):
+            # wenn du eine Figure mit der gleichen Position findest
+            if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
+                id = self.figures_black[i].getID()
+                self.figures_black[i].setPos(newPos[0], newPos[1])
+                return id
+            if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
+                id = self.figures_white[i].getID()
+                self.figures_white[i].setPos(newPos[0], newPos[1])
+                return id
+        return None
+
+
     # geht die Liste durch und schaut, ob für die Position eine Figur erkannt wurde
     def checkLists(self, Position, Bool):
         # gehe die Listen durch
@@ -190,8 +205,10 @@ class Checks:
 
                 # ändern der Position der gerückten Figur
                 if self.saveid < 17:  # weiße Figur, ändern in der weißen Liste
+                    posvor = self.figures_white[self.save_figure_num].getPos()
                     self.figures_white[self.save_figure_num].setPos(self.posX, self.posY)
                 else:  # schwarze Figur, ändern in der schwarzen Liste
+                    posvor = self.figures_black[self.save_figure_num].getPos()
                     self.figures_black[self.save_figure_num].setPos(self.posX, self.posY)
 
                 # löschen des Markers
@@ -203,6 +220,9 @@ class Checks:
                 # ausgewählte Figur nun nicht mehr ausgewählt
                 self.saveid = None
                 self.save_figure_num = None
+
+                # gültigen Zug in Listbox eintragen
+                gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY)
 
                 # Zug vollendet eine neue Runde Beginnt
                 self.Runde += 1
