@@ -155,6 +155,7 @@ class GUI:
         self.my_listbox.insert(tk.END, string)
         self.listend+=1
         self.listakt+=1
+        self.my_listbox.yview(tk.END)
 
     def getListend(self, i):
         return self.my_listbox.get(i)

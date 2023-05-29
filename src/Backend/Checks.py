@@ -101,8 +101,8 @@ class Checks:
         else:
             print(arr)
             bool = True
-            # gehe das ganze Array durch,
-            for i in range(1, len(arr)):
+            # gehe zwischen Raum durch
+            for i in range(1, len(arr)-1):
                 # checke bei jeder Position, ob eine Figur darauf steht:
                 pos = (arr[i][0], arr[i][1])
                 print(arr[i])
@@ -268,8 +268,10 @@ class Checks:
 
                     # ändern der Position der schlagenden Figur
                     if self.saveid < 17:  # weiße Figur, ändern in der weißen Liste
+                        posvor = self.figures_white[self.save_figure_num].getPos()
                         self.figures_white[self.save_figure_num].setPos(self.posX, self.posY)
                     else:  # schwarze Figur, ändern in der schwarzen Liste
+                        posvor = self.figures_black[self.save_figure_num].getPos()
                         self.figures_black[self.save_figure_num].setPos(self.posX, self.posY)
 
                     # deaktivieren(verkleinern der neuen Figur
@@ -282,6 +284,8 @@ class Checks:
                     gui.switchImgofFigur(self.posX, self.posY, self.saveid)
                     gui.loescheImgofFigur(self.id)
 
+                    # gültigen Zug in Listbox eintragen
+                    gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY)
                     # Es folgt ein Runden inkrement, da nun gegnerische Farbe antwortet auf vorherigen Zug
                     self.Runde += 1
 
