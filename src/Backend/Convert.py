@@ -18,5 +18,11 @@ class Convert:
         return (posX - 1) * 55 + 30, (posY - 1) * 55 + 30
 
     def convFieLet(self, posX):
-        return self.letters[posX]
+        return self.letters[posX-1]
+
+    def convLetFie(self, string):
+        print(string)
+        for i in range(0, 8):
+            if string == self.letters[i]:
+                return i+1
 

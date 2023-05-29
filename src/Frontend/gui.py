@@ -17,34 +17,49 @@ class GUI:
 
         self.clickEvent = ClickEvent(self)
 
+        self.goBackBool = False
+
         self.x = 0
         self.y = 0
 
         self.root = tk.Tk()
         self.root.title("Schachpositionsanalyse")
-        self.root.geometry("1300x800")
+        self.root.geometry("1470x950")
 
         start_text = tk.Label(self.root)
         start_text["text"] = "Schachspiel mit Positionsanalyse"
         start_text["font"] = "Arial 30 underline"
         start_text.place(x=430, y=0, height=100, width=450)
 
-        self.canvas = tk.Canvas(self.root, bg="black", width=440, height=440)
+        self.canvas = tk.Canvas(self.root, bg="black", width=438, height=438, highlightthickness=2, highlightbackground="#04d9ff")
         self.canvas.place(x=100, y=200)
 
+        self.output_text = tk.Label(self.root)
+        self.output_text.config(
+             text="Output", font="Arial, 18", borderwidth=2, relief="ridge"
+        )
+        self.output_text.place(x=100, y=720, height=80, width=450)
+
+        # Liste von Zügen
+        self.my_listbox = tk.Listbox(self.root, height=26, activestyle="dotbox")
+        self.my_listbox.place(x=580, y=200)
+        self.my_listbox.insert(tk.END, "Züge:")
+        self.listend = 0
+        self.listakt = 0
+
         self.canvas_trenn = tk.Canvas(self.root, bg=None, width=20, height=600)
-        self.canvas_trenn.place(x=640, y=150)
+        self.canvas_trenn.place(x=790, y=150)
 
         # Fenster mit Video Input
-        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=440, height=440)
-        self.canvas_vidin.place(x=740, y=200)
+        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
+        self.canvas_vidin.place(x=890, y=200)
         self.vid = vi.VidIn()
         th.Thread(target=lambda: self.update()).start()
 
         # Erstellen des Schachbretthintergrundes
         background = Image.open(self.abs_path+"Chessboard.png")
         background_img = ImageTk.PhotoImage(background)
-        self.canvas.create_image(223, 223, image=background_img)
+        self.canvas.create_image(222, 222, image=background_img)
 
         # Erstellen der Figuren
         self.createImgs()
@@ -60,7 +75,7 @@ class GUI:
         button_back["font"] = "Century-Gothic, 24"
         button_back.place(x=250, y=650, height=50, width=70)
 
-        button_next = tk.Button(self.root, command=lambda: self.goNext())
+        button_next = tk.Button(self.root, command=lambda: self.goForward())
         button_next["text"] = ">"
         button_next["font"] = "Century-Gothic, 24"
         button_next.place(x=325, y=650, height=50, width=70)
@@ -80,7 +95,7 @@ class GUI:
         self.canvas_trenn.create_line(9, 5, 9, 605, width=2)
 
         # Überschrift Video Input Canvas
-        tk.Label(self.root, text='Camera Video Input:', font='Century-Gothic, 20').place(x=735, y=180, height=20, width=200)
+        tk.Label(self.root, text='Camera Video Input:', font='Century-Gothic, 20').place(x=885, y=180, height=20, width=200)
 
         # Figuren erstellen:
         self.fig = fig.Figuren(None, None, None, None, None)
@@ -91,6 +106,15 @@ class GUI:
 
         # Mainloop starten
         self.root.mainloop()
+
+    def changeOutput(self, string):
+        self.output_text.config(text=string)
+
+    def ErrorOn(self):
+        self.canvas.config(highlightbackground="red")
+
+    def ErrorOff(self):
+        self.canvas.config(highlightbackground="#04d9ff")
 
     def update(self):
         ret, frame = self.vid.get_frame()
@@ -103,7 +127,8 @@ class GUI:
             self.root.after(15, self.update())
 
     def callback(self, e):
-        self.clickEvent.on_click(e.x, e.y)
+        if not self.goBackBool:
+            self.clickEvent.on_click(e.x, e.y)
 
     def getfigLists(self):
         return self.fig.getLists()
@@ -118,6 +143,68 @@ class GUI:
         self.loescheImgofFigur(id)
         posx, posy = con.Convert().convFiePos(x, y)
         self.erstelleImgofFigur(posx, posy, id)
+
+    # Funktionalitäten für die Liste und das vor und Zurückspringen von Zügen.
+    # Wird rein grafisch implementiert. Solange man nicht beim aktuellen Stand zurück ist, wird keine Eingabe akzeptiert
+    def insertItemInList(self, x1, y1, x2, y2):
+        # y1 und y2 in Buchstaben wandeln
+        convert = con.Convert()
+        y1 = convert.convFieLet(y1)
+        y2 = convert.convFieLet(y2)
+        string = (x1, y1, "-->", x2, y2)
+        self.my_listbox.insert(tk.END, string)
+        self.listend+=1
+        self.listakt+=1
+        self.my_listbox.yview(tk.END)
+
+    def getListend(self, i):
+        return self.my_listbox.get(i)
+
+    def goBack(self):
+        # holen uns die Koordinaten vom aktuellen index
+        string = self.my_listbox.get(self.listakt)
+
+        if string != 'Züge:':
+            x1 = string[0]
+            y1 = con.Convert().convLetFie(string[1])
+            x2 = string[3]
+            y2 = con.Convert().convLetFie(string[4])
+
+            # holt sich die ID vom hinteren, ändert die Position zum vorderen
+            id = self.clickEvent.passThrough((x2, y2), (x1, y1))
+            print(id)
+            self.switchImgofFigur(x1, y1, id)
+            self.goBackBool = True
+            self.listakt-=1
+            self.ErrorOn()
+            self.changeOutput("Nicht aktueller Spielstand")
+
+        else:
+            self.changeOutput("Zurück nicht möglich")
+
+    def goForward(self):
+        if self.listakt == self.listend:
+            self.changeOutput("Vor nicht möglich")
+            self.goBackBool = False
+        else:
+            self.listakt+=1
+            string = self.my_listbox.get(self.listakt)
+            x1 = string[0]
+            y1 = con.Convert().convLetFie(string[1])
+            x2 = string[3]
+            y2 = con.Convert().convLetFie(string[4])
+
+            # holt sich die ID vom vorderen und setzt es auf das hintere
+            id = self.clickEvent.passThrough((x1, y1),(x2, y2))
+            print(id)
+            self.switchImgofFigur(x2, y2, id)
+            if self.listakt == self.listend:
+                self.goBackBool = False
+                self.changeOutput("Aktueller Spielstand erreicht")
+                self.ErrorOff()
+
+    def deleteList(self):
+        return
 
     def createImgs(self):
         ################################################################################################################

@@ -8,3 +8,6 @@ class ClickEvent:
 
     def on_click(self, x, y):
         self.check.checkFigure(x, y, self.gui)
+
+    def passThrough (self, Position, newPosition):
+        return self.check.returnID(Position, newPosition)

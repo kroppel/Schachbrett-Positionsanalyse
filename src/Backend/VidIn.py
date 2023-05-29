@@ -42,6 +42,7 @@ class VidIn:
     def get_frame(self):
         if self.vid.isOpened():
             ret, img = self.vid.read()
+            img = resize_image(img, 1.5)
 
             if ret:
                 img = resize_image(img, 1.5)
