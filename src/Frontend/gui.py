@@ -54,7 +54,7 @@ class GUI:
         self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
         self.canvas_vidin.place(x=890, y=200)
         self.vid = vi.VidIn()
-        th.Thread(target=lambda: self.update()).start()
+        th.Thread(target=lambda: self.start()).start()
 
         # Erstellen des Schachbretthintergrundes
         background = Image.open(self.abs_path+"Chessboard.png")
@@ -116,6 +116,11 @@ class GUI:
     def ErrorOff(self):
         self.canvas.config(highlightbackground="#04d9ff")
 
+    def start(self):
+        while(True):
+            self.root.after(15, self.update())
+
+
     def update(self):
         ret, frame = self.vid.get_frame()
 
@@ -124,7 +129,6 @@ class GUI:
             frame = frame.resize((440, 440), Image.ANTIALIAS)   # muss noch umgeändert werden
             self.photo = ImageTk.PhotoImage(image=frame)
             self.canvas_vidin.create_image(0, 0, image=self.photo, anchor=tk.NW)
-            self.root.after(15, self.update())
 
     def callback(self, e):
         if not self.goBackBool:
