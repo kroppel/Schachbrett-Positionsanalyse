@@ -99,13 +99,13 @@ class Checks:
         # 2.2 Ansonsten handelt es sich um einen größeren Zug, bei dem Figuren dazwischen stehen könnten
         # bis auf die erste und letze Stelle soll dieses überprüft werden, ob es ein Feld gibt, auf dem eine Figur steht
         else:
-            print(arr)
+            # print(arr)
             bool = True
             # gehe zwischen Raum durch
             for i in range(1, len(arr)-1):
                 # checke bei jeder Position, ob eine Figur darauf steht:
                 pos = (arr[i][0], arr[i][1])
-                print(arr[i])
+                # print(arr[i])
                 if (self.checkLists(pos, False)):
                     bool = False
                     break
@@ -119,17 +119,30 @@ class Checks:
             return bool
 
     # gibt für das Backtracking die ID zurück und ändert die Position
-    def returnID(self, Position, newPos):
-        for i in range(0, 16):
-            # wenn du eine Figure mit der gleichen Position findest
-            if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
-                id = self.figures_black[i].getID()
-                self.figures_black[i].setPos(newPos[0], newPos[1])
-                return id
-            if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
-                id = self.figures_white[i].getID()
-                self.figures_white[i].setPos(newPos[0], newPos[1])
-                return id
+    def returnID(self, Position, newPos, id):
+        # erst soll er nach der Aktiven Figur suchen
+        if id is not None:
+            for i in range(0, 16):
+                # wir kennen die ID der Figur die laut dead Figure zuletzt getötet wurde
+                if self.figures_black[i].getID() == id:
+                    # print("changed toggle of: ", id)
+                    self.figures_black[i].toggleActive()
+                    return None
+                if self.figures_white[i].getID() == id:
+                    # print("changed toggle of: ", id)
+                    self.figures_white[i].toggleActive()
+                    return None
+        else:
+            for i in range(0, 16):
+                # wenn du eine Figure mit der gleichen Position findest
+                if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
+                    id = self.figures_black[i].getID()
+                    self.figures_black[i].setPos(newPos[0], newPos[1])
+                    return id
+                if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
+                    id = self.figures_white[i].getID()
+                    self.figures_white[i].setPos(newPos[0], newPos[1])
+                    return id
         return None
 
 
@@ -142,17 +155,17 @@ class Checks:
                 if Bool:
                     self.id = self.figures_black[i].getID()
                     self.figure_num = i
-                    print("Schwarze Figur erkannt", self.id)
-                else:
-                    print("Figur erkannt")
+                    # print("Schwarze Figur erkannt", self.id)
+                # else:
+                    # print("Figur erkannt")
                 return True
             if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
                 if Bool:
                     self.id = self.figures_white[i].getID()
                     self.figure_num = i
-                    print("Weiße Figur erkannt", self.id)
-                else:
-                    print("Figur erkannt")
+                    # print("Weiße Figur erkannt", self.id)
+                # else:
+                    #print("Figur erkannt")
                 return True
         return False
 
@@ -198,7 +211,7 @@ class Checks:
 
         if (self.id is None) & (not self.saveid is None):
             # Überprüfen, ob der Zug möglich ist
-            print(self.saveid)
+            # print(self.saveid)
             if self.checkZug(False) is True:
                 gui.changeOutput("Zug erkannt, Figur wird gerückt")
                 gui.ErrorOff()
@@ -222,7 +235,7 @@ class Checks:
                 self.save_figure_num = None
 
                 # gültigen Zug in Listbox eintragen
-                gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY)
+                gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY, None)
 
                 # Zug vollendet eine neue Runde Beginnt
                 self.Runde += 1
@@ -285,7 +298,7 @@ class Checks:
                     gui.loescheImgofFigur(self.id)
 
                     # gültigen Zug in Listbox eintragen
-                    gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY)
+                    gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY, self.id)
                     # Es folgt ein Runden inkrement, da nun gegnerische Farbe antwortet auf vorherigen Zug
                     self.Runde += 1
 

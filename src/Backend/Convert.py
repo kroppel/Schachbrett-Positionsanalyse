@@ -6,11 +6,9 @@ class Convert:
     def convPosFie(self, x, y):
         for posx in range(0, 9):
             if x <= posx * 55:
-                print(posx)
                 break
         for posy in range(0, 9):
             if y <= posy * 55:
-                print(posy)
                 break
         return posx, posy
 
@@ -21,7 +19,6 @@ class Convert:
         return self.letters[posX-1]
 
     def convLetFie(self, string):
-        print(string)
         for i in range(0, 8):
             if string == self.letters[i]:
                 return i+1

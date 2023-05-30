@@ -21,7 +21,7 @@ class Figuren:
         return arr
 
     def merge(self, xs, ys):
-        print(xs, ys)
+        # print(xs, ys)
         arr = []
         for i in range(0, len(xs)):
             arr.append([xs[i], ys[i]])
@@ -49,6 +49,12 @@ class Figuren:
     def getActive(self):
         return self.active
 
+    def toggleActive(self):
+        if self.active:
+            self.active = False
+        else:
+            self.active = True
+
     def createFig(self):
         # Vergabe der IDS wie folgt (weiße Figuren unten):
         # 25 26 27 28 29 30 31 32
@@ -57,6 +63,25 @@ class Figuren:
         #
         #  9 10 11 12 13 14 15 16
         #  1  2  3  4  5  6  7  8
+
+        self.figures_white = [
+            Rook(1, "w", 1, 1, 5),
+            Knight(2, "w", 2, 1, 3),
+            Bishop(3, "w", 3, 1, 3),
+            Queen(4, "w", 4, 1, 9),
+            King(5, "w", 5, 1, 0),
+            Bishop(6, "w", 6, 1, 3),
+            Knight(7, "w", 7, 1, 3),
+            Rook(8, "w", 8, 1, 5),
+            Pawn(9, "w", 1, 2, 1),
+            Pawn(10, "w", 2, 2, 1),
+            Pawn(11, "w", 3, 2, 1),
+            Pawn(12, "w", 4, 2, 1),
+            Pawn(13, "w", 5, 2, 1),
+            Pawn(14, "w", 6, 2, 1),
+            Pawn(15, "w", 7, 2, 1),
+            Pawn(16, "w", 8, 2, 1),
+        ]
 
         self.figures_black = [
             Pawn(17, "b", 1, 7, 1),
@@ -76,24 +101,7 @@ class Figuren:
             Knight(31, "b", 7, 8, 3),
             Rook(32, "b", 8, 8, 5),
         ]
-        self.figures_white = [
-            Rook(1, "w", 1, 1, 5),
-            Knight(2, "w", 2, 1, 3),
-            Bishop(3, "w", 3, 1, 3),
-            Queen(4, "w", 4, 1, 9),
-            King(5, "w", 5, 1, 0),
-            Bishop(6, "w", 6, 1, 3),
-            Knight(7, "w", 7, 1, 3),
-            Rook(8, "w", 8, 1, 5),
-            Pawn(9, "w", 1, 2, 1),
-            Pawn(10, "w", 2, 2, 1),
-            Pawn(11, "w", 3, 2, 1),
-            Pawn(12, "w", 4, 2, 1),
-            Pawn(13, "w", 5, 2, 1),
-            Pawn(14, "w", 6, 2, 1),
-            Pawn(15, "w", 7, 2, 1),
-            Pawn(16, "w", 8, 2, 1),
-        ]
+
 
     def getLists(self):
         return self.figures_black, self.figures_white
