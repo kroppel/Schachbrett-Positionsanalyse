@@ -136,6 +136,8 @@ class GUI:
     def callback(self, e):
         if not self.goBackBool:
             self.clickEvent.on_click(e.x, e.y)
+        else:
+            print("Fehler")
 
     def getfigLists(self):
         return self.fig.getLists()
@@ -192,9 +194,9 @@ class GUI:
                 self.count -= 1
                 pos = con.Convert().convFiePos(x2, y2)
                 deadID = self.deadFigures[self.count]
-                print(deadID)
+                # print(deadID)
                 id = self.clickEvent.passThrough((x2, y2), (x1, y1), None)
-                print(id)
+                # print(id)
                 self.switchImgofFigur(x1, y1, id)
                 self.erstelleImgofFigur(pos[0], pos[1], deadID)
                 self.clickEvent.passThrough((x2, y2), (x1, y1), deadID)

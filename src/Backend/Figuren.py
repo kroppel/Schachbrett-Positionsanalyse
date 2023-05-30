@@ -14,6 +14,9 @@ class Figuren:
             arr.append(i)
         return arr
 
+    def retSelf(self):
+        return self
+
     def countDown(self, x1, x2):
         arr = []
         for i in range(x1, x2 - 1, -1):
@@ -48,6 +51,9 @@ class Figuren:
 
     def getActive(self):
         return self.active
+
+    def getSeite(self):
+        return self.seite
 
     def toggleActive(self):
         if self.active:

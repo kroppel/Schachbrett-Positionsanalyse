@@ -10,6 +10,14 @@ class Checks:
         self.Runde = 1
         return
 
+    def idToPos(self, id):  # gibt die einer Figur zugehörige aktuelle Position wieder
+        if id < 17:
+            return self.figures_white[id-1].getPos()
+        else:
+            return self.figures_black[id-17].getPos()
+
+
+
     def checkSchach(self):
         return
 
@@ -25,43 +33,52 @@ class Checks:
     def checkEnpassant(self):
         return
 
+    def getFigure(self, id):
+        if id > 17:
+            return self.figures_black[id-17].retSelf()
+        else:
+            return self.figures_white[id].retSelf()
+
+    def checkGedeckt(self, pos):
+        # wenn eine Figur von einer anderen gedeckt wird, kann der König sie nicht schlagen
+        # um zu schauen, ob eine Figur gedeckt wird, muss an alle Figuren der gleich Farbe durchgehen
+        # und schauen, ob ihr nächster Zug auf der Position der gedeckten Figur enden könnte.
+
+        print("checkGedeckt aktiv")
+        # je nach Seite sollen alle MitFiguren auf die Position überprüft werden
+        if self.saveid < 17:
+            for i in range(0, 16):
+                # wenn größer 8 dann sind es Bauern die zwei Werte mehr benötigen
+                if 7 < self.save_figure_num:
+                    answer, arr = self.figures_white[self.save_figure_num].Zug(
+                        pos[0], pos[1], True, "white"
+                    )
+                    break
+                else:
+                    answer, arr = self.figures_white[self.save_figure_num].Zug(pos[0], pos[1])
+                    break
+        else:
+            for i in range(0, 16):
+                if 8 > self.save_figure_num:
+                    answer, arr = self.figures_black[self.save_figure_num].Zug(
+                        pos[0], pos[1], True, "black"
+                    )
+                    break
+                else:
+                    answer, arr = self.figures_black[self.save_figure_num].Zug(pos[0], pos[1])
+                    break
+        # überprüfung fertig
+        print(answer)
+        return answer
+
     def checkSchach(self):
-        # Wir machen Folgendes: Wir gehen jeweils alle Figuren der gegnerischen Seite durch und checken beim Beenden des
-        # gegnerischen Zuges, ob es ein legitimer Zug wäre, wenn sie als Nächstes auf das Feld des Königs ziehen,
-        # wenn es für alle Figuren False zurück gibt, ist er nicht im Schach, ansonsten schon.
-
-        # Weiß ist am Zug
-        if (self.Runde % 2) == 1:
-            # aktuelle Position des Weißen Königs ermitteln
-            posX, posY = self.figures_white[4].getPos()
-            # Prüfen alle Schwarzen auf Pos von weißem König
-            for i in range(0, len(self.figures_black)):
-                if 8 > i:
-                    answer, arr = self.figures_black[i].Zug(posX, posY, True, "black")
-                else:
-                    answer, arr = self.figures_black[i].Zug(posX, posY)
-                if answer:
-                    Schach = True
-                    break
-                else:
-                    Schach = False
-
-        # Schwarz ist am Zug
-        if (self.Runde % 2) == 0:
-            # aktuelle Position des Weißen Königs ermitteln
-            posX, posY = self.figures_white[4].getPos()
-            # Prüfen alle Schwarzen auf Pos von weißem König
-            for i in range(0, len(self.figures_white)):
-                if 8 < i:
-                    answer, arr = self.figures_white[i].Zug(posX, posY, True, "white")
-                else:
-                    answer, arr = self.figures_white[i].Zug(posX, posY)
-                if answer:
-                    Schach = True
-                    break
-                else:
-                    Schach = False
-        return Schach
+        # überprüfen beide Könige, ob sie "gedeckt" werden von einer gegnerischen Figur
+        w_könig_pos = self.idToPos(5)
+        s_könig_pos = self.idToPos(28)
+        if self.checkGedeckt(w_könig_pos):
+            print("Weißer König steht im Schach")
+        if self.checkGedeckt(s_könig_pos):
+            print("Schwarzer König steht im Schach")
 
     def checkPinned(self):
         return
@@ -69,7 +86,7 @@ class Checks:
     # überprüft die Legitimität des Zuges
     def checkZug(self, schlagen):
         bauer = 0
-        if self.saveid < 16:
+        if self.saveid < 17:
             # wenn größer 8 dann sind es Bauern die zwei Werte mehr benötigen
             if 7 < self.save_figure_num:
                 answer, arr = self.figures_white[self.save_figure_num].Zug(
@@ -92,9 +109,14 @@ class Checks:
         if not answer:
             return False
         # 2. Wenn answer = True, dann gibt es ein array was mitgegeben wird,
-        # 2.1 Wenn dieses array leer ist, dann handelt es sich um den König, den Bauern oder das Pferd, welche nur 1 Feld Züge
-        # machen können oder über Figuren Springen dürfen, dann ist die Rückgabe True
+        # 2.1 Wenn dieses array leer ist, dann handelt es sich um den König, den Bauern oder das Pferd,
+        # welche nur 1 Feld Züge machen können oder über Figuren Springen dürfen
         elif answer & (len(arr) == 0):
+            # handelt es sich nun um den König, muss geschaut werden, ob die gegnerische Figur aktuell gedeckt wird.
+            if (self.saveid == 5) or (self.saveid == 29):
+                if self.checkGedeckt((self.posX, self.posY)):
+                    print("Es handelt sich um den König, die gegnerische Figur wird gedeckt, oder man steht sonst im Schach")
+                    return False
             return True
         # 2.2 Ansonsten handelt es sich um einen größeren Zug, bei dem Figuren dazwischen stehen könnten
         # bis auf die erste und letze Stelle soll dieses überprüft werden, ob es ein Feld gibt, auf dem eine Figur steht
@@ -230,6 +252,9 @@ class Checks:
                 # das Bild der Figur auf die neue Position setzen
                 gui.switchImgofFigur(self.posX, self.posY, self.saveid)
 
+                # auf Schach überprüfen:
+                self.checkSchach()
+
                 # ausgewählte Figur nun nicht mehr ausgewählt
                 self.saveid = None
                 self.save_figure_num = None
@@ -301,6 +326,9 @@ class Checks:
                     gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY, self.id)
                     # Es folgt ein Runden inkrement, da nun gegnerische Farbe antwortet auf vorherigen Zug
                     self.Runde += 1
+
+                    # auf Schach überprüfen
+                    self.checkSchach()
 
                     # Auswahl gelöscht
                     self.saveid = None
