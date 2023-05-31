@@ -198,3 +198,18 @@ def get_figures_in_fields(fields):
     
     return figures
 
+def compare_states(last_state, current_state):
+    # detect difference between last state and current state
+    diff_state = current_state - last_state
+    if not np.add.reduce(diff_state, None) == 0:
+        print("Illegal State Change!")
+        return -1, diff_state
+
+    elif np.add.reduce(np.abs(diff_state), None) == 0:
+        return 0, diff_state
+    
+    else:
+        return 1, diff_state
+    
+
+
