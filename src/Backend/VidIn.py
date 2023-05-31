@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields
+from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields, compare_states
 import sys
 from time import sleep
 import threading as th
@@ -12,6 +12,8 @@ class VidIn:
         self.vid = cv2.VideoCapture(video_source)
         self.pts1 = []
         self.startvid()
+        self.figure_state = np.vstack((np.ones((2,8)), np.zeros((4,8)), np.ones((2,8))))
+        self.compare_state_counter = 5
 
     def startvid(self):
         input = 0 if len(sys.argv) == 1 else sys.argv[1]
@@ -62,7 +64,20 @@ class VidIn:
                             for j in np.arange(fields.shape[1]):
                                 fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
                         figs = get_figures_in_fields(fields)
-                        print(figs)
+                        ret_compare, diff_state = compare_states(figure_state, figs)
+
+                        if ret_compare == -1:
+                            self.compare_state_counter = 5
+                        elif ret_compare == 0:
+                            self.compare_state_counter -= 1
+                        else:
+                            self.compare_state_counter = 5
+
+                        if self.compare_state_counter == 0:
+                            self.compare_state_counter = 5
+                            self.figure_state = figs
+                            print("New State:\n"+str(figs))
+
 
                         return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
 
