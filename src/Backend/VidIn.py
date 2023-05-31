@@ -45,7 +45,7 @@ class VidIn:
             img = resize_image(img, 1.5)
 
             if ret:
-                img = resize_image(img, 1.5)
+                #img = resize_image(img, 1.5)
 
                 img = cv2.warpPerspective(img, self.M, (800, 800))
                 img_threshold = preprocessing(img)
