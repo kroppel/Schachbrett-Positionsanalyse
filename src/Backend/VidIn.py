@@ -1,19 +1,23 @@
 import numpy as np
 import cv2
-from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields, compare_states
+from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields, compare_states, get_move_coordinates
 import sys
 from time import sleep
 import threading as th
+#import Frontend.GUI
 
+FRAME_COUNTER_THRESHOLD = 5
 
 class VidIn:
 
-    def __init__(self, video_source=0):
+    def __init__(self, gui, video_source=0):
         self.vid = cv2.VideoCapture(video_source)
+        self.gui = gui
         self.pts1 = []
         self.startvid()
-        self.figure_state = np.vstack((np.ones((2,8)), np.zeros((4,8)), np.ones((2,8))))
-        self.compare_state_counter = 5
+        self.last_figure_state = np.vstack((np.ones((2,8)), np.zeros((4,8)), np.ones((2,8))))
+        self.new_figure_state = None
+        self.compare_state_counter = FRAME_COUNTER_THRESHOLD
 
     def startvid(self):
         input = 0 if len(sys.argv) == 1 else sys.argv[1]
@@ -47,8 +51,6 @@ class VidIn:
             img = resize_image(img, 1.5)
 
             if ret:
-                img = resize_image(img, 1.5)
-
                 img = cv2.warpPerspective(img, self.M, (800, 800))
                 img_threshold = preprocessing(img)
 
@@ -64,19 +66,30 @@ class VidIn:
                             for j in np.arange(fields.shape[1]):
                                 fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
                         figs = get_figures_in_fields(fields)
-                        ret_compare, diff_state = compare_states(figure_state, figs)
+                        #print(figs)
+                        ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
 
-                        if ret_compare == -1:
-                            self.compare_state_counter = 5
-                        elif ret_compare == 0:
-                            self.compare_state_counter -= 1
+                        if ret_compare_last <= 0:
+                            self.compare_state_counter = FRAME_COUNTER_THRESHOLD
                         else:
-                            self.compare_state_counter = 5
+                            if self.new_figure_state is None:
+                                self.new_figure_state = figs
+                            else:
+                                ret_compare_new, diff_state_new =  compare_states(self.new_figure_state, figs)
+                                if ret_compare_new != 0:
+                                    self.new_figure_state = None
+                                    self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                                else:
+                                    self.compare_state_counter -= 1
 
                         if self.compare_state_counter == 0:
-                            self.compare_state_counter = 5
-                            self.figure_state = figs
-                            print("New State:\n"+str(figs))
+                            self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                            self.last_figure_state = self.new_figure_state
+                            print("New State: \n"+str(self.last_figure_state))
+                            p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
+                            self.gui.callback_move_detection(p1)
+                            sleep(2)
+                            self.gui.callback_move_detection(p2)
 
 
                         return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
