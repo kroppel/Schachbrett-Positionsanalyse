@@ -120,8 +120,8 @@ class King(Figuren):
     # König kann in alle Richtungen 1ne Position weiterrücken heißt,
     # solange sich x und x old sowie y und y old um 1 unterscheiden ist ok
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
-        if (0 <= abs(self.posX - x) <= 1) | (0 <= abs(self.posY - y) <= 1):
+        # self.printAll(x, y)
+        if (0 <= abs(self.posX - x) <= 1) & (0 <= abs(self.posY - y) <= 1):
             return True, []
         else:
             return False, []
@@ -133,9 +133,9 @@ class Queen(Figuren):
 
     # Königin setzt sich aus Bishop or Rook zusammen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # 1. bewegt sie sich wie ein Bishop:
-        if abs(self.posX - x) == (abs(self.posY - y)):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
             else:
@@ -175,7 +175,7 @@ class Rook(Figuren):
 
     # Turm darf nur horizontal oder vertikal bewegt werden
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # bewegt sich vertikal
         if (self.posX == x) & (self.posY != y):
             xs = []
@@ -208,7 +208,7 @@ class Knight(Figuren):
     # bem Pferd müssen wir nicht auf dazwischen stehende Figuren überprüfen,
     # denn diese können alle anderen überspringen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         if ((abs(self.posX - x) == 1) & (abs(self.posY - y) == 2)) | (
                 ((abs(self.posX - x)) == 2) & (abs(self.posY - y) == 1)):
             return True, []
@@ -221,9 +221,9 @@ class Bishop(Figuren):
 
     # darf sich nur auf der Diagonalen Bewegen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # lassen erst überprüfen, ob der Zug überhaupt möglich wäre:
-        if abs(self.posX - x) == abs(self.posY - y):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
             # wenn ja geben wir True und das Array mit allen dazwischen liegenden pos zurück
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
@@ -248,7 +248,7 @@ class Pawn(Figuren):
         self.moved_b = True
 
     def Zug(self, x, y, schlagen, Seite) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         xs = []
         # abhängig von der Seite muss er ein/zwei Felder nach unten oder oben
         if Seite == "white":
