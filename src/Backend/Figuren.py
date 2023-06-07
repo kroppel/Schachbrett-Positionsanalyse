@@ -14,6 +14,9 @@ class Figuren:
             arr.append(i)
         return arr
 
+    def retSelf(self):
+        return self
+
     def countDown(self, x1, x2):
         arr = []
         for i in range(x1, x2 - 1, -1):
@@ -21,7 +24,7 @@ class Figuren:
         return arr
 
     def merge(self, xs, ys):
-        print(xs, ys)
+        # print(xs, ys)
         arr = []
         for i in range(0, len(xs)):
             arr.append([xs[i], ys[i]])
@@ -49,6 +52,15 @@ class Figuren:
     def getActive(self):
         return self.active
 
+    def getSeite(self):
+        return self.seite
+
+    def toggleActive(self):
+        if self.active:
+            self.active = False
+        else:
+            self.active = True
+
     def createFig(self):
         # Vergabe der IDS wie folgt (weiße Figuren unten):
         # 25 26 27 28 29 30 31 32
@@ -58,24 +70,6 @@ class Figuren:
         #  9 10 11 12 13 14 15 16
         #  1  2  3  4  5  6  7  8
 
-        self.figures_black = [
-            Pawn(17, "b", 1, 7, 1),
-            Pawn(18, "b", 2, 7, 1),
-            Pawn(19, "b", 3, 7, 1),
-            Pawn(20, "b", 4, 7, 1),
-            Pawn(21, "b", 5, 7, 1),
-            Pawn(22, "b", 6, 7, 1),
-            Pawn(23, "b", 7, 7, 1),
-            Pawn(24, "b", 8, 7, 1),
-            Rook(25, "b", 1, 8, 5),
-            Knight(26, "b", 2, 8, 3),
-            Bishop(27, "b", 3, 8, 3),
-            Queen(28, "b", 4, 8, 9),
-            King(29, "b", 5, 8, 0),
-            Bishop(30, "b", 6, 8, 3),
-            Knight(31, "b", 7, 8, 3),
-            Rook(32, "b", 8, 8, 5),
-        ]
         self.figures_white = [
             Rook(1, "w", 1, 1, 5),
             Knight(2, "w", 2, 1, 3),
@@ -95,6 +89,26 @@ class Figuren:
             Pawn(16, "w", 8, 2, 1),
         ]
 
+        self.figures_black = [
+            Pawn(17, "b", 1, 7, 1),
+            Pawn(18, "b", 2, 7, 1),
+            Pawn(19, "b", 3, 7, 1),
+            Pawn(20, "b", 4, 7, 1),
+            Pawn(21, "b", 5, 7, 1),
+            Pawn(22, "b", 6, 7, 1),
+            Pawn(23, "b", 7, 7, 1),
+            Pawn(24, "b", 8, 7, 1),
+            Rook(25, "b", 1, 8, 5),
+            Knight(26, "b", 2, 8, 3),
+            Bishop(27, "b", 3, 8, 3),
+            Queen(28, "b", 4, 8, 9),
+            King(29, "b", 5, 8, 0),
+            Bishop(30, "b", 6, 8, 3),
+            Knight(31, "b", 7, 8, 3),
+            Rook(32, "b", 8, 8, 5),
+        ]
+
+
     def getLists(self):
         return self.figures_black, self.figures_white
 
@@ -106,8 +120,8 @@ class King(Figuren):
     # König kann in alle Richtungen 1ne Position weiterrücken heißt,
     # solange sich x und x old sowie y und y old um 1 unterscheiden ist ok
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
-        if (0 <= abs(self.posX - x) <= 1) | (0 <= abs(self.posY - y) <= 1):
+        # self.printAll(x, y)
+        if (0 <= abs(self.posX - x) <= 1) & (0 <= abs(self.posY - y) <= 1):
             return True, []
         else:
             return False, []
@@ -119,9 +133,9 @@ class Queen(Figuren):
 
     # Königin setzt sich aus Bishop or Rook zusammen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # 1. bewegt sie sich wie ein Bishop:
-        if abs(self.posX - x) == (abs(self.posY - y)):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
             else:
@@ -161,7 +175,7 @@ class Rook(Figuren):
 
     # Turm darf nur horizontal oder vertikal bewegt werden
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # bewegt sich vertikal
         if (self.posX == x) & (self.posY != y):
             xs = []
@@ -194,7 +208,7 @@ class Knight(Figuren):
     # bem Pferd müssen wir nicht auf dazwischen stehende Figuren überprüfen,
     # denn diese können alle anderen überspringen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         if ((abs(self.posX - x) == 1) & (abs(self.posY - y) == 2)) | (
                 ((abs(self.posX - x)) == 2) & (abs(self.posY - y) == 1)):
             return True, []
@@ -207,9 +221,9 @@ class Bishop(Figuren):
 
     # darf sich nur auf der Diagonalen Bewegen
     def Zug(self, x, y) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         # lassen erst überprüfen, ob der Zug überhaupt möglich wäre:
-        if abs(self.posX - x) == abs(self.posY - y):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
             # wenn ja geben wir True und das Array mit allen dazwischen liegenden pos zurück
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
@@ -234,7 +248,7 @@ class Pawn(Figuren):
         self.moved_b = True
 
     def Zug(self, x, y, schlagen, Seite) -> bool | list:
-        self.printAll(x, y)
+        # self.printAll(x, y)
         xs = []
         # abhängig von der Seite muss er ein/zwei Felder nach unten oder oben
         if Seite == "white":

@@ -18,6 +18,9 @@ class GUI:
         self.clickEvent = ClickEvent(self)
 
         self.goBackBool = False
+        self.count = 0
+
+        self.deadFigures = []
 
         self.x = 0
         self.y = 0
@@ -133,6 +136,8 @@ class GUI:
     def callback(self, e):
         if not self.goBackBool:
             self.clickEvent.on_click(e.x, e.y)
+        else:
+            print("Fehler")
 
     def callback_move_detection(self, p):
         p = con.Convert().convFiePos(p[1]+1, p[0]+1)
@@ -152,17 +157,25 @@ class GUI:
         posx, posy = con.Convert().convFiePos(x, y)
         self.erstelleImgofFigur(posx, posy, id)
 
+
     # Funktionalitäten für die Liste und das vor und Zurückspringen von Zügen.
     # Wird rein grafisch implementiert. Solange man nicht beim aktuellen Stand zurück ist, wird keine Eingabe akzeptiert
-    def insertItemInList(self, x1, y1, x2, y2):
+    def insertItemInList(self, x1, y1, x2, y2, id):
         # y1 und y2 in Buchstaben wandeln
         convert = con.Convert()
         y1 = convert.convFieLet(y1)
         y2 = convert.convFieLet(y2)
-        string = (x1, y1, "-->", x2, y2)
+        # geben die id der geschlagenen Figur mit, damit er sie beim Zurückgehen wieder erstellen kann
+        if id is not None:
+            self.deadFigures.append(id)
+            self.count += 1
+            string = (x1, y1, "-->", x2, y2, "!")
+        else:
+            string = (x1, y1, "-->", x2, y2, ".")
+
         self.my_listbox.insert(tk.END, string)
-        self.listend+=1
-        self.listakt+=1
+        self.listend += 1
+        self.listakt += 1
         self.my_listbox.yview(tk.END)
 
     def getListend(self, i):
@@ -177,13 +190,28 @@ class GUI:
             y1 = con.Convert().convLetFie(string[1])
             x2 = string[3]
             y2 = con.Convert().convLetFie(string[4])
+            geschlagen = string[5]
 
-            # holt sich die ID vom hinteren, ändert die Position zum vorderen
-            id = self.clickEvent.passThrough((x2, y2), (x1, y1))
-            print(id)
-            self.switchImgofFigur(x1, y1, id)
+            # wenn ein Ausrufezeichen hinter dem String steht, wurde eine Figur geschlagen
+            if geschlagen == "!":
+                # wenn dem so ist, soll er das img der Figur wiederherstellen
+                self.count -= 1
+                pos = con.Convert().convFiePos(x2, y2)
+                deadID = self.deadFigures[self.count]
+                # print(deadID)
+                id = self.clickEvent.passThrough((x2, y2), (x1, y1), None)
+                # print(id)
+                self.switchImgofFigur(x1, y1, id)
+                self.erstelleImgofFigur(pos[0], pos[1], deadID)
+                self.clickEvent.passThrough((x2, y2), (x1, y1), deadID)
+
+            else:
+                id = self.clickEvent.passThrough((x2, y2), (x1, y1), None)
+                print(id)
+                self.switchImgofFigur(x1, y1, id)
+
             self.goBackBool = True
-            self.listakt-=1
+            self.listakt -= 1
             self.ErrorOn()
             self.changeOutput("Nicht aktueller Spielstand")
 
@@ -195,17 +223,27 @@ class GUI:
             self.changeOutput("Vor nicht möglich")
             self.goBackBool = False
         else:
-            self.listakt+=1
+            self.listakt += 1
             string = self.my_listbox.get(self.listakt)
             x1 = string[0]
             y1 = con.Convert().convLetFie(string[1])
             x2 = string[3]
             y2 = con.Convert().convLetFie(string[4])
+            geschlagen = string[5]
+
+            # wenn ein Ausrufezeichen hinter dem String steht, wurde eine Figur geschlagen
+            if geschlagen == "!":
+                # wenn dem so ist, soll er das img der Figur wiederherstellen
+                deadID = self.deadFigures[self.count]
+                self.switchImgofFigur(x2, y2, self.clickEvent.passThrough((x1, y1), (x2, y2), None))
+                self.loescheImgofFigur(deadID)
+                self.clickEvent.passThrough((x1, y1), (x2, y2), deadID)
+
+                self.count += 1
+            else:
+                self.switchImgofFigur(x2, y2, self.clickEvent.passThrough((x1, y1), (x2, y2), None))
 
             # holt sich die ID vom vorderen und setzt es auf das hintere
-            id = self.clickEvent.passThrough((x1, y1),(x2, y2))
-            print(id)
-            self.switchImgofFigur(x2, y2, id)
             if self.listakt == self.listend:
                 self.goBackBool = False
                 self.changeOutput("Aktueller Spielstand erreicht")
