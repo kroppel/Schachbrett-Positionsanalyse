@@ -53,7 +53,7 @@ class GUI:
         # Fenster mit Video Input
         self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
         self.canvas_vidin.place(x=890, y=200)
-        self.vid = vi.VidIn()
+        self.vid = vi.VidIn(self)
         th.Thread(target=lambda: self.start()).start()
 
         # Erstellen des Schachbretthintergrundes
@@ -133,6 +133,10 @@ class GUI:
     def callback(self, e):
         if not self.goBackBool:
             self.clickEvent.on_click(e.x, e.y)
+
+    def callback_move_detection(self, p):
+        p = con.Convert().convFiePos(p[1]+1, p[0]+1)
+        self.clickEvent.on_click(p[0], p[1])
 
     def getfigLists(self):
         return self.fig.getLists()

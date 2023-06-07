@@ -181,7 +181,7 @@ def detect_figure_in_field(field):
     cv2.imshow("Field", field)
     k = cv2.waitKey(0)"""
 
-    if (pixel_sum > field.shape[0]*field.shape[1]/12):
+    if (pixel_sum > field.shape[0]*field.shape[1]/16):
         return True
 
     return False
@@ -198,3 +198,33 @@ def get_figures_in_fields(fields):
     
     return figures
 
+# State comparison return values:
+# -1 : invalid
+# 0  : no change
+# 1  : figure moved
+# 2  : figure beaten
+def compare_states(last_state, current_state):
+    # detect difference between last state and current state
+    diff_state = current_state - last_state
+
+    if not np.add.reduce(diff_state, None) == 0 or (not np.add.reduce(np.abs(diff_state), None) <= 2):
+        print("Illegal State Change!")
+        return -1, diff_state
+
+    elif np.add.reduce(np.abs(diff_state), None) == 0:
+        return 0, diff_state
+
+    elif np.add.reduce((diff_state), None) == -1:
+        return 2, diff_state
+    
+    else:
+        return 1, diff_state
+
+def get_move_coordinates(compare_value, diff_state):
+    if compare_value == 1:
+        i1 = np.where(diff_state.flatten()==-1)[0]
+        i2 = np.where(diff_state.flatten()==1)[0]
+        return ((i1//8,i1%8), (i2//8,i2%8))
+    if compare_value == 2:
+        pass
+    
