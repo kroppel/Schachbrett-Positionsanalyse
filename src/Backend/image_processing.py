@@ -8,6 +8,18 @@ def preprocessing(img):
 
     return img_threshold
 
+def preprocessing_figs(img):
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([255, 255, 30])
+    lower_white = np.array([0, 40, 125])
+    upper_white = np.array([60, 255, 255])
+
+    mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
+    mask_white = cv2.inRange(img_hsv, lower_white, upper_white)
+
+    return mask_black, mask_white
+
 
 def resize_image(img, factor):
     return cv2.resize(img, (int(img.shape[1]*factor), int(img.shape[0]*factor)), interpolation = cv2.INTER_LINEAR)
@@ -188,14 +200,17 @@ def detect_figure_in_field(field):
     return False
 
 
-def get_figures_in_fields(fields):
-    figures = np.zeros_like(fields)
+def get_figures_in_fields(fields_black, fields_white):
+    figures = np.zeros((2, fields_black.shape[0], fields_black.shape[1]))
 
-    for i in np.arange(fields.shape[0]):
-        for j in np.arange(fields.shape[1]):
-            field = fields[i,j]
-            if detect_figure_in_field(field):
-                figures[i,j] = 1
+    for i in np.arange(fields_black.shape[0]):
+        for j in np.arange(fields_black.shape[1]):
+            field_black = fields_black[i,j]
+            field_white = fields_white[i,j]
+            if detect_figure_in_field(field_black):
+                figures[0,i,j] = 1
+            elif detect_figure_in_field(field_white):
+                figures[1,i,j] = 1
     
     return figures
 
@@ -207,15 +222,16 @@ def get_figures_in_fields(fields):
 def compare_states(last_state, current_state):
     # detect difference between last state and current state
     diff_state = current_state - last_state
+    #print(diff_state)
 
-    if not np.add.reduce(diff_state, None) == 0 or (not np.add.reduce(np.abs(diff_state), None) <= 2):
+    if (not np.add.reduce(diff_state, None) == 0) and (not np.add.reduce(np.abs(diff_state), None) == 3):
         print("Illegal State Change!")
         return -1, diff_state
 
     elif np.add.reduce(np.abs(diff_state), None) == 0:
         return 0, diff_state
 
-    elif np.add.reduce((diff_state), None) == -1:
+    elif np.add.reduce(np.abs(diff_state), None) == 3:
         return 2, diff_state
     
     else:
@@ -223,9 +239,13 @@ def compare_states(last_state, current_state):
 
 def get_move_coordinates(compare_value, diff_state):
     if compare_value == 1:
-        i1 = np.where(diff_state.flatten()==-1)[0]
-        i2 = np.where(diff_state.flatten()==1)[0]
+        i1 = np.where(diff_state.flatten()==-1)[0]%64
+        i2 = np.where(diff_state.flatten()==1)[0]%64
         return ((i1//8,i1%8), (i2//8,i2%8))
     if compare_value == 2:
-        pass
+        # determine if black beat white figure (i0==0) or the other way around
+        i0 = np.where(diff_state.flatten()==1)[0]//64
+        i1 = np.where(diff_state[i0,:].flatten()==-1)[0]
+        i2 = np.where(diff_state[i0,:].flatten()==1)[0]
+        return ((i1//8,i1%8), (i2//8,i2%8))
     

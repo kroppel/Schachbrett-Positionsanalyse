@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-from Backend.image_processing import preprocessing, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, resize_image, get_figures_in_fields, compare_states, get_move_coordinates
+from Backend.image_processing import preprocessing, preprocessing_figs, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, \
+                                     resize_image, get_figures_in_fields, compare_states, get_move_coordinates
 import sys
 from time import sleep
 import threading as th
@@ -15,7 +16,7 @@ class VidIn:
         self.gui = gui
         self.pts1 = []
         self.startvid()
-        self.last_figure_state = np.vstack((np.ones((2,8)), np.zeros((4,8)), np.ones((2,8))))
+        self.last_figure_state = np.concatenate((np.vstack((np.zeros((6,8)), np.ones((2,8))))[np.newaxis,:],np.vstack((np.ones((2,8)), np.zeros((6,8))))[np.newaxis,:]), axis=0)
         self.new_figure_state = None
         self.compare_state_counter = FRAME_COUNTER_THRESHOLD
 
@@ -52,19 +53,25 @@ class VidIn:
             if ret:
                 img = cv2.warpPerspective(img, self.M, (800, 800))
                 img_threshold = preprocessing(img)
-
                 h_lines, v_lines = filter_lines(extract_lines(img_threshold))
 
                 if not h_lines is None and not v_lines is None:
                     intersections = get_intersections(h_lines, v_lines)
                     if not intersections is None:
                         img_display = draw_lines(img, h_lines + v_lines)
+                        img_black, img_white = preprocessing_figs(img)
 
-                        fields = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
-                        for i in np.arange(fields.shape[0]):
-                            for j in np.arange(fields.shape[1]):
-                                fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
-                        figs = get_figures_in_fields(fields)
+                        #return ret, cv2.cvtColor(img_black, cv2.COLOR_BGR2RGB)
+
+                        fields_white = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
+                        fields_black = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
+
+                        for i in np.arange(fields_white.shape[0]):
+                            for j in np.arange(fields_white.shape[1]):
+                                fields_white[i,j] = img_white[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
+                                fields_black[i,j] = img_black[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]                        
+                        
+                        figs = get_figures_in_fields(fields_black, fields_white)
                         ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
 
                         if ret_compare_last <= 0:
