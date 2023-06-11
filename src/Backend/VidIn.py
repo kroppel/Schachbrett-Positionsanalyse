@@ -6,7 +6,7 @@ from time import sleep
 import threading as th
 #import Frontend.GUI
 
-FRAME_COUNTER_THRESHOLD = 5
+FRAME_COUNTER_THRESHOLD = 4
 
 class VidIn:
 
@@ -30,7 +30,6 @@ class VidIn:
                 cv2.setMouseCallback("Input", self.get_points, self.pts1)
                 if not cv2.waitKey(1) < 0:
                     break
-            print("yeah")
             self.pts1 = np.float32(self.pts1)
             # sortieren nach x koordinate
             self.pts1 = self.pts1[np.argsort(self.pts1[:,0]),:]
@@ -66,7 +65,6 @@ class VidIn:
                             for j in np.arange(fields.shape[1]):
                                 fields[i,j] = img_threshold[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
                         figs = get_figures_in_fields(fields)
-                        #print(figs)
                         ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
 
                         if ret_compare_last <= 0:

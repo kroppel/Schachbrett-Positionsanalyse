@@ -4,7 +4,7 @@ import numpy as np
 def preprocessing(img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                 # Convert the input image to a grayscale
     img_threshold = cv2.adaptiveThreshold(src=img_gray, maxValue=255, \
-        adaptiveMethod = cv2.ADAPTIVE_THRESH_MEAN_C, thresholdType=cv2.THRESH_BINARY_INV, blockSize=15, C=6)
+        adaptiveMethod = cv2.ADAPTIVE_THRESH_MEAN_C, thresholdType=cv2.THRESH_BINARY_INV, blockSize=15, C=3)
 
     return img_threshold
 
@@ -171,17 +171,18 @@ def get_intersections(h_lines, v_lines):
     return intersections
 
 def detect_figure_in_field(field):
-    n = 10
+    pruning_size = 10
+    field_detection_threshold = field.shape[0]*field.shape[1]/16
     # field edge pruning
-    field = field[n:field.shape[0]-n, n:field.shape[1]-n]
+    field = field[pruning_size:field.shape[0]-pruning_size, pruning_size:field.shape[1]-pruning_size]
 
     pixel_sum = int(np.add.reduce(field, None)/255)
-    """print("Pixel sum: {0} | Threshold: {1}".format(pixel_sum, field.shape[0]*field.shape[1]/12))
+    """print("Pixel sum: {0} | Threshold: {1}".format(pixel_sum, field_detection_threshold))
 
     cv2.imshow("Field", field)
     k = cv2.waitKey(0)"""
 
-    if (pixel_sum > field.shape[0]*field.shape[1]/16):
+    if (pixel_sum > field_detection_threshold):
         return True
 
     return False
