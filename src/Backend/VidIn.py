@@ -109,10 +109,6 @@ class VidIn:
                                     self.gui.callback_move_detection(p1_from)
                                     sleep(2)
                                     self.gui.callback_move_detection(p1_to)
-                                    sleep(2)
-                                    self.gui.callback_move_detection(p2_from)
-                                    sleep(2)
-                                    self.gui.callback_move_detection(p2_to)
                             elif ret_compare_last != -1:
                                 self.gui.callback_move_detection(p1)
                                 sleep(2)
