@@ -61,7 +61,6 @@ class VidIn:
                         img_display = draw_lines(img, h_lines + v_lines)
                         img_black, img_white = preprocessing_figs(img)
 
-
                         #return ret, cv2.cvtColor(img_black, cv2.COLOR_BGR2RGB)
 
                         fields_white = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)

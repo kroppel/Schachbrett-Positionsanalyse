@@ -10,8 +10,8 @@ def preprocessing(img):
 
 def preprocessing_figs(img):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower_black = np.array([0, 0, 0])
-    upper_black = np.array([255, 255, 30])
+    lower_black = np.array([50, 0, 0])
+    upper_black = np.array([255, 230, 25])
     lower_white = np.array([0, 40, 125])
     upper_white = np.array([60, 255, 255])
 
@@ -183,8 +183,8 @@ def get_intersections(h_lines, v_lines):
     return intersections
 
 def detect_figure_in_field(field):
-    pruning_size = 10
-    field_detection_threshold = field.shape[0]*field.shape[1]/20
+    pruning_size = 15
+    field_detection_threshold = field.shape[0]*field.shape[1]/48
     # field edge pruning
     field = field[pruning_size:field.shape[0]-pruning_size, pruning_size:field.shape[1]-pruning_size]
 
@@ -225,6 +225,8 @@ def compare_states(last_state, current_state):
 
     if (not np.add.reduce(diff_state, None) == 0) and (not np.add.reduce(np.abs(diff_state), None) == 3):
         print("Illegal State Change!")
+        print(last_state)
+        print(current_state)
         return -1, diff_state
 
     # No move
@@ -244,6 +246,7 @@ def compare_states(last_state, current_state):
         return 1, diff_state
 
 def get_move_coordinates(compare_value, diff_state):
+    diff_state = np.flip(diff_state, 0)
     if compare_value == 1:
         i1 = np.where(diff_state.flatten()==-1)[0]%64
         i2 = np.where(diff_state.flatten()==1)[0]%64

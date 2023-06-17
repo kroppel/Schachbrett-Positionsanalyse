@@ -1,15 +1,16 @@
-import Backend.Checks as ch
+import Backend.Logic as log
 
 
 class ClickEvent:
     def __init__(self, gui):
-        self.check = ch.Checks()
-        self.gui = gui
+        self.logic = log.Logic(gui)
         self.oldx = -1
         self.oldy = -1
 
     def on_click(self, x, y):
-        self.check.checkAll(x, y, self.gui)
+        # self.check.checkAll(x, y, self.gui)
+        self.logic.input(x, y)
 
-    def passThrough (self, Position, newPosition, id):
-        return self.check.returnID(Position, newPosition, id)
+    def tipp(self):
+        return self.logic.byStock()
+
