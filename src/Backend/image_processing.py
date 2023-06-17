@@ -184,7 +184,7 @@ def get_intersections(h_lines, v_lines):
 
 def detect_figure_in_field(field):
     pruning_size = 10
-    field_detection_threshold = field.shape[0]*field.shape[1]/16
+    field_detection_threshold = field.shape[0]*field.shape[1]/20
     # field edge pruning
     field = field[pruning_size:field.shape[0]-pruning_size, pruning_size:field.shape[1]-pruning_size]
 
@@ -208,9 +208,9 @@ def get_figures_in_fields(fields_black, fields_white):
             field_black = fields_black[i,j]
             field_white = fields_white[i,j]
             if detect_figure_in_field(field_black):
-                figures[0,i,j] = 1
-            elif detect_figure_in_field(field_white):
                 figures[1,i,j] = 1
+            elif detect_figure_in_field(field_white):
+                figures[0,i,j] = 1
     
     return figures
 
@@ -222,18 +222,24 @@ def get_figures_in_fields(fields_black, fields_white):
 def compare_states(last_state, current_state):
     # detect difference between last state and current state
     diff_state = current_state - last_state
-    #print(diff_state)
 
     if (not np.add.reduce(diff_state, None) == 0) and (not np.add.reduce(np.abs(diff_state), None) == 3):
         print("Illegal State Change!")
         return -1, diff_state
 
+    # No move
     elif np.add.reduce(np.abs(diff_state), None) == 0:
         return 0, diff_state
 
+    # Figure beaten
     elif np.add.reduce(np.abs(diff_state), None) == 3:
         return 2, diff_state
+
+    # Rochade
+    elif np.add.reduce(np.abs(diff_state), None) == 4:
+        return 3, diff_state
     
+    # Standard move
     else:
         return 1, diff_state
 
@@ -241,11 +247,28 @@ def get_move_coordinates(compare_value, diff_state):
     if compare_value == 1:
         i1 = np.where(diff_state.flatten()==-1)[0]%64
         i2 = np.where(diff_state.flatten()==1)[0]%64
+        print([i1, i2])
+
         return ((i1//8,i1%8), (i2//8,i2%8))
-    if compare_value == 2:
+    elif compare_value == 2:
         # determine if black beat white figure (i0==0) or the other way around
         i0 = np.where(diff_state.flatten()==1)[0]//64
         i1 = np.where(diff_state[i0,:].flatten()==-1)[0]
         i2 = np.where(diff_state[i0,:].flatten()==1)[0]
         return ((i1//8,i1%8), (i2//8,i2%8))
+    elif compare_value == 3:
+        # determine if valid Rochade
+        valid_move_indices = [[0,3,1,2],[3,7,4,5],[56,59,57,58],[59,63,60,61]]
+        # moved-from indices
+        i0, i1 = np.where(diff_state.flatten()==-1)%64
+        # moved-to indices
+        i2, i3 = np.where(diff_state.flatten()==1)%64
+
+        print([i0, i1, i2, i3])
+        
+        if [i0, i1, i2, i3] not in valid_move_indices:
+            return None, None
+
+        else:
+            return ((i0//8,i0%8), (i1//8,i1%8)), ((i2//8,i2%8), (i3//8,i3%8))
     

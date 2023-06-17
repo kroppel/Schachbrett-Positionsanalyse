@@ -61,6 +61,7 @@ class VidIn:
                         img_display = draw_lines(img, h_lines + v_lines)
                         img_black, img_white = preprocessing_figs(img)
 
+
                         #return ret, cv2.cvtColor(img_black, cv2.COLOR_BGR2RGB)
 
                         fields_white = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
@@ -71,30 +72,51 @@ class VidIn:
                                 fields_white[i,j] = img_white[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]
                                 fields_black[i,j] = img_black[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]                        
                         
+                        # get current figure state
                         figs = get_figures_in_fields(fields_black, fields_white)
+                        # compare current figure state with last saved figure state
                         ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
 
+                        # reset counter if figure state invalid or not changed
                         if ret_compare_last <= 0:
                             self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                        # potential valid move
                         else:
                             if self.new_figure_state is None:
                                 self.new_figure_state = figs
                             else:
                                 ret_compare_new, diff_state_new =  compare_states(self.new_figure_state, figs)
+                                # new state has changed -> reset counter
                                 if ret_compare_new != 0:
                                     self.new_figure_state = None
                                     self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                                # new state has not changed -> decrease counter
                                 else:
                                     self.compare_state_counter -= 1
 
                         if self.compare_state_counter == 0:
                             self.compare_state_counter = FRAME_COUNTER_THRESHOLD
                             self.last_figure_state = self.new_figure_state
+                            self.new_figure_state = None
                             print("New State: \n"+str(self.last_figure_state))
                             p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
-                            self.gui.callback_move_detection(p1)
-                            sleep(2)
-                            self.gui.callback_move_detection(p2)
+
+                            # perform double move (Rochade)
+                            if ret_compare_last == 3:
+                                if not (p1 is None):
+                                    p1_from, p2_from = p1
+                                    p1_to, p2_to = p2
+                                    self.gui.callback_move_detection(p1_from)
+                                    sleep(2)
+                                    self.gui.callback_move_detection(p1_to)
+                                    sleep(2)
+                                    self.gui.callback_move_detection(p2_from)
+                                    sleep(2)
+                                    self.gui.callback_move_detection(p2_to)
+                            elif ret_compare_last != -1:
+                                self.gui.callback_move_detection(p1)
+                                sleep(2)
+                                self.gui.callback_move_detection(p2)
 
 
                         return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
