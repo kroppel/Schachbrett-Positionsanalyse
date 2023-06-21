@@ -10,8 +10,8 @@ def preprocessing(img):
 
 def preprocessing_figs(img):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower_black = np.array([50, 0, 0])
-    upper_black = np.array([255, 230, 25])
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([255, 230, 27])
     lower_white = np.array([0, 40, 125])
     upper_white = np.array([60, 255, 255])
 
@@ -261,17 +261,27 @@ def get_move_coordinates(compare_value, diff_state):
         return ((i1//8,i1%8), (i2//8,i2%8))
     elif compare_value == 3:
         # determine if valid Rochade
-        valid_move_indices = [[0,3,1,2],[3,7,4,5],[56,59,57,58],[59,63,60,61]]
+        valid_move_indices = [[0,4,2,3],[4,7,5,6],[56,60,58,59],[60,63,61,62]]
         # moved-from indices
-        i0, i1 = np.where(diff_state.flatten()==-1)%64
+        #print(np.where(diff_state.flatten()==-1)[0])
+        i0, i1 = np.where(diff_state.flatten()==-1)[0]%64
         # moved-to indices
-        i2, i3 = np.where(diff_state.flatten()==1)%64
+        i2, i3 = np.where(diff_state.flatten()==1)[0]%64
 
         print([i0, i1, i2, i3])
         
         if [i0, i1, i2, i3] not in valid_move_indices:
+            print("Invalid Move!")
             return None, None
 
         else:
-            return ((i0//8,i0%8), (i1//8,i1%8)), ((i2//8,i2%8), (i3//8,i3%8))
+            if [i0, i1, i2, i3] == [0,4,2,3]:
+                return (4, 2)
+            if [i0, i1, i2, i3] == [4,7,5,6]:
+                return (4, 6)
+            if [i0, i1, i2, i3] == [56,60,58,59]:
+                return (60, 58)
+            if [i0, i1, i2, i3] == [60,63,61,62]:
+                return (60, 62)
+
     

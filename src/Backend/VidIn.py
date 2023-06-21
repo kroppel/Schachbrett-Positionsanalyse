@@ -61,7 +61,7 @@ class VidIn:
                         img_display = draw_lines(img, h_lines + v_lines)
                         img_black, img_white = preprocessing_figs(img)
 
-                        #return ret, cv2.cvtColor(img_black, cv2.COLOR_BGR2RGB)
+                        #return ret, cv2.cvtColor(img_white, cv2.COLOR_BGR2RGB)
 
                         fields_white = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
                         fields_black = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
@@ -100,15 +100,7 @@ class VidIn:
                             print("New State: \n"+str(self.last_figure_state))
                             p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
 
-                            # perform double move (Rochade)
-                            if ret_compare_last == 3:
-                                if not (p1 is None):
-                                    p1_from, p2_from = p1
-                                    p1_to, p2_to = p2
-                                    self.gui.callback_move_detection(p1_from)
-                                    sleep(2)
-                                    self.gui.callback_move_detection(p1_to)
-                            elif ret_compare_last != -1:
+                            if ret_compare_last != -1 and not (p1 is None):
                                 self.gui.callback_move_detection(p1)
                                 sleep(2)
                                 self.gui.callback_move_detection(p2)
