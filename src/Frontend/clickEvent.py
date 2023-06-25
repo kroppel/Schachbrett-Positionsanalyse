@@ -9,7 +9,7 @@ class ClickEvent:
 
     def on_click(self, x, y):
         # self.check.checkAll(x, y, self.gui)
-        self.logic.input(x, y)
+        return self.logic.input(x, y)
 
     def tipp(self):
         return self.logic.byStock()

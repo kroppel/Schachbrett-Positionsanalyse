@@ -179,7 +179,7 @@ class GUI:
 
     def callback_move_detection(self, p):
         p = con.Convert().convFiePos(p[1] + 1, 8 - p[0])
-        self.clickEvent.on_click(p[0], p[1])
+        return self.clickEvent.on_click(p[0], p[1])
 
     def getfigLists(self):
         return self.fig.getLists()

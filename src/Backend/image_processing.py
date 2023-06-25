@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+DEBUG = False
+
 def preprocessing(img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                 # Convert the input image to a grayscale
     img_threshold = cv2.adaptiveThreshold(src=img_gray, maxValue=255, \
@@ -11,12 +13,15 @@ def preprocessing(img):
 def preprocessing_figs(img):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower_black = np.array([0, 0, 0])
-    upper_black = np.array([255, 230, 27])
+    upper_black = np.array([255, 230, 21])
     lower_white = np.array([0, 40, 125])
     upper_white = np.array([60, 255, 255])
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
     mask_white = cv2.inRange(img_hsv, lower_white, upper_white)
+
+    mask_black = cv2.dilate(cv2.morphologyEx(mask_black, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11)))
+    mask_white = cv2.dilate(cv2.morphologyEx(mask_white, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5)))
 
     return mask_black, mask_white
 
@@ -223,34 +228,39 @@ def compare_states(last_state, current_state):
     # detect difference between last state and current state
     diff_state = current_state - last_state
 
-    if (not np.add.reduce(diff_state, None) == 0) and (not np.add.reduce(np.abs(diff_state), None) == 3):
-        print("Illegal State Change!")
-        print(last_state)
-        print(current_state)
-        return -1, diff_state
-
     # No move
-    elif np.add.reduce(np.abs(diff_state), None) == 0:
+    if np.add.reduce(np.abs(diff_state), None) == 0:
         return 0, diff_state
+    
+    # Standard move
+    elif np.add.reduce(np.abs(diff_state), None) == 2 and np.add.reduce(diff_state, None) == 0:
+        return 1, diff_state
 
     # Figure beaten
-    elif np.add.reduce(np.abs(diff_state), None) == 3:
+    elif np.add.reduce(np.abs(diff_state), None) == 3 and np.add.reduce(diff_state, None) == -1:
         return 2, diff_state
 
     # Rochade
-    elif np.add.reduce(np.abs(diff_state), None) == 4:
+    elif np.add.reduce(np.abs(diff_state), None) == 4 and np.add.reduce(diff_state, None) == 0:
         return 3, diff_state
     
-    # Standard move
     else:
-        return 1, diff_state
+        if DEBUG:
+            print("Illegal State Change!")
+            print(last_state)
+            print(current_state)
+        return -1, diff_state
+    
 
 def get_move_coordinates(compare_value, diff_state):
-    diff_state = np.flip(diff_state, 0)
+    if DEBUG:
+        print("Diff State:" + str(diff_state))
+        print("Cmp Value:" + str(compare_value))
+
+    #diff_state = np.flip(diff_state, 0)
     if compare_value == 1:
         i1 = np.where(diff_state.flatten()==-1)[0]%64
         i2 = np.where(diff_state.flatten()==1)[0]%64
-        print([i1, i2])
 
         return ((i1//8,i1%8), (i2//8,i2%8))
     elif compare_value == 2:
@@ -263,25 +273,24 @@ def get_move_coordinates(compare_value, diff_state):
         # determine if valid Rochade
         valid_move_indices = [[0,4,2,3],[4,7,5,6],[56,60,58,59],[60,63,61,62]]
         # moved-from indices
-        #print(np.where(diff_state.flatten()==-1)[0])
         i0, i1 = np.where(diff_state.flatten()==-1)[0]%64
         # moved-to indices
         i2, i3 = np.where(diff_state.flatten()==1)[0]%64
-
-        print([i0, i1, i2, i3])
         
         if [i0, i1, i2, i3] not in valid_move_indices:
-            print("Invalid Move!")
+            if DEBUG:
+                print([i0, i1, i2, i3])
+                print("Invalid Move!")
             return None, None
 
         else:
             if [i0, i1, i2, i3] == [0,4,2,3]:
-                return (4, 2)
+                return ((0,4), (0,2))
             if [i0, i1, i2, i3] == [4,7,5,6]:
-                return (4, 6)
+                return ((0,4), (0,6))
             if [i0, i1, i2, i3] == [56,60,58,59]:
-                return (60, 58)
+                return ((7,4), (7,2))
             if [i0, i1, i2, i3] == [60,63,61,62]:
-                return (60, 62)
+                return ((7,4), (7,6))
 
     

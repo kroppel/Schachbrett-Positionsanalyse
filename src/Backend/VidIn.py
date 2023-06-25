@@ -10,7 +10,6 @@ import threading as th
 FRAME_COUNTER_THRESHOLD = 4
 
 class VidIn:
-
     def __init__(self, gui, video_source=0):
         self.vid = cv2.VideoCapture(video_source)
         self.gui = gui
@@ -94,16 +93,22 @@ class VidIn:
                                     self.compare_state_counter -= 1
 
                         if self.compare_state_counter == 0:
-                            self.compare_state_counter = FRAME_COUNTER_THRESHOLD
-                            self.last_figure_state = self.new_figure_state
-                            self.new_figure_state = None
-                            print("New State: \n"+str(self.last_figure_state))
                             p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
 
                             if ret_compare_last != -1 and not (p1 is None):
                                 self.gui.callback_move_detection(p1)
                                 sleep(2)
-                                self.gui.callback_move_detection(p2)
+                                move_valid_gui = self.gui.callback_move_detection(p2)
+                           
+                            if move_valid_gui:
+                                self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                                self.last_figure_state = self.new_figure_state
+                                self.new_figure_state = None
+                                print("New State: \n"+str(self.last_figure_state))
+
+                            else:
+                                self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+                                self.new_figure_state = None
 
 
                         return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
@@ -118,7 +123,6 @@ class VidIn:
 
     def get_points(self, event, x, y, flags, points):
         if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
-            print((x,y))
             points.append([x, y])
 
 
