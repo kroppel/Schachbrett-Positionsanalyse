@@ -5,7 +5,7 @@ class Convert:
 
     def convPosFie(self, x, y):
         for posx in range(0, 9):
-            if x <= posx * 55:
+            if x <= (posx * 55):
                 break
         for posy in range(0, 9):
             if y >= (385 - posy * 55):

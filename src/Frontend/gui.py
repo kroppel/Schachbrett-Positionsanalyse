@@ -22,6 +22,8 @@ class GUI:
         self.goBackBool = False
         self.count = 0
 
+        self.arrow = None;
+
         self.rect = None
 
         self.Figures = []
@@ -125,6 +127,13 @@ class GUI:
         t2 = int(time.time()*1000)
         self.changeOutput(result+" ("+str(t2-t1)+" ms)")
 
+        # result to Coordinates:
+        x1, y1 = con.Convert().convFiePos(con.Convert().convLetFie(result[0]), int(result[1]))
+        x2, y2 = con.Convert().convFiePos(con.Convert().convLetFie(result[2]), int(result[3]))
+
+        # draw the arrow
+        self.drawArrow(x1, y1, x2, y2)
+
     def newGame(self):
         self.clickEvent = ClickEvent(self)
         # löschen aller aktiven images
@@ -156,6 +165,12 @@ class GUI:
 
     def ErrorOff(self):
         self.canvas.config(highlightbackground="#04d9ff")
+
+    def drawArrow(self, x1, y1, x2, y2):
+        self.arrow = self.canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill="green", width=4)
+
+    def deleteArrow(self):
+        self.canvas.delete(self.arrow)
 
 ########################################################################################################################
     def start(self):
@@ -233,6 +248,8 @@ class GUI:
         print(self.count)
         # holen uns die Koordinaten vom aktuellen index
         string = self.my_listbox.get(self.listakt)
+
+        self.deleteArrow()
 
         print("String to handle: ", string)
 

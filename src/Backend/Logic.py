@@ -15,8 +15,8 @@ class Logic:
         self.finished = False
         self.gui = gui
         self.round = 0
-        #self.stock = Stockfish(path="/opt/homebrew/Cellar/stockfish/15.1/bin/stockfish", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
-        self.stock = Stockfish(path="C:/Users/konst/Downloads/stockfish_15.1_win_x64_popcnt/stockfish-windows-2022-x86-64-modern.exe", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
+        self.stock = Stockfish(path="/opt/homebrew/Cellar/stockfish/15.1/bin/stockfish", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
+        #self.stock = Stockfish(path="C:/Users/konst/Downloads/stockfish_15.1_win_x64_popcnt/stockfish-windows-2022-x86-64-modern.exe", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
 
 
     # input of mouseClick
@@ -24,6 +24,7 @@ class Logic:
         print("###########\nStatus:")
         print(self.board.unicode())
 
+        self.gui.deleteArrow()
         delete = False
 
         # if the game is not finished:
