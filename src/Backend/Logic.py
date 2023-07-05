@@ -23,6 +23,7 @@ class Logic:
     def input(self, x, y):
         print("###########\nStatus:")
         print(self.board.unicode())
+        ret_value = 0
 
         self.gui.deleteArrow()
         delete = False
@@ -91,6 +92,7 @@ class Logic:
                     self.saved_input = None
                     self.save_color = None
                     self.round += 1
+                    ret_value = 1
                 # pawn promotion
                 elif c.Move.from_uci(str(move) + "q") in self.board.legal_moves:
                         print("Pawn Promotion detected")
@@ -110,6 +112,8 @@ class Logic:
 
                 # check game finished
                 self._checkCheck()
+
+        return ret_value
 
     def _checkCheck(self):
         if self.board.is_checkmate():
