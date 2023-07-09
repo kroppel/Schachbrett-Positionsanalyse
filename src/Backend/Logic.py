@@ -69,7 +69,7 @@ class Logic:
                         self.saved_posl = posl
                         self.save_piece = piece
                         self.gui.legalPick(pos)
-                        return
+                        return ret_value
 
                 # convert to letter:
                 l1 = cv.convFieLet(self.saved_input[0])
@@ -105,6 +105,7 @@ class Logic:
                         self.saved_input = None
                         self.save_color = None
                         self.round += 1
+                        ret_value = 1
                 else:
                     # GUI Change
                     print("illegal Move")

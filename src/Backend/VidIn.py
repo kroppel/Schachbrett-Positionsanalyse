@@ -19,6 +19,13 @@ class VidIn:
         self.new_figure_state = None
         self.compare_state_counter = FRAME_COUNTER_THRESHOLD
 
+    def restart(self, gui, video_source=0):
+        self.vid = cv2.VideoCapture(video_source)
+        self.gui = gui
+        self.last_figure_state = np.concatenate((np.vstack((np.zeros((6,8)), np.ones((2,8))))[np.newaxis,:],np.vstack((np.ones((2,8)), np.zeros((6,8))))[np.newaxis,:]), axis=0)
+        self.new_figure_state = None
+        self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+
     def startvid(self):
         input = 0 if len(sys.argv) == 1 else sys.argv[1]
 
@@ -72,6 +79,7 @@ class VidIn:
                         
                         # get current figure state
                         figs = get_figures_in_fields(fields_black, fields_white)
+                        print(figs)
                         # compare current figure state with last saved figure state
                         ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
 
@@ -94,10 +102,11 @@ class VidIn:
 
                         if self.compare_state_counter == 0:
                             p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
+                            move_valid_gui = False
 
                             if ret_compare_last != -1 and not (p1 is None):
                                 self.gui.callback_move_detection(p1)
-                                sleep(2)
+                                sleep(1)
                                 move_valid_gui = self.gui.callback_move_detection(p2)
                            
                             if move_valid_gui:

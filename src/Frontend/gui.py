@@ -153,6 +153,7 @@ class GUI:
         self.ErrorOff()
         self.changeOutput("Neues Spiel")
         self.canvas.delete(self.rect)
+        self.vid.restart(self)
 
 
 ########################################################################################################################

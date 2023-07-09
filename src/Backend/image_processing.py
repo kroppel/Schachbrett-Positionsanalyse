@@ -15,7 +15,7 @@ def preprocessing_figs(img):
     lower_black = np.array([0, 0, 0])
     upper_black = np.array([255, 230, 21])
     lower_white = np.array([0, 40, 125])
-    upper_white = np.array([60, 255, 255])
+    upper_white = np.array([20, 255, 255])
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
     mask_white = cv2.inRange(img_hsv, lower_white, upper_white)
@@ -189,7 +189,7 @@ def get_intersections(h_lines, v_lines):
 
 def detect_figure_in_field(field):
     pruning_size = 15
-    field_detection_threshold = field.shape[0]*field.shape[1]/48
+    field_detection_threshold = field.shape[0]*field.shape[1]/42
     # field edge pruning
     field = field[pruning_size:field.shape[0]-pruning_size, pruning_size:field.shape[1]-pruning_size]
 
@@ -262,12 +262,19 @@ def get_move_coordinates(compare_value, diff_state):
         i1 = np.where(diff_state.flatten()==-1)[0]%64
         i2 = np.where(diff_state.flatten()==1)[0]%64
 
+        if i1.shape[0]>1 or i2.shape[0]>1:
+            return None, None
+
         return ((i1//8,i1%8), (i2//8,i2%8))
     elif compare_value == 2:
         # determine if black beat white figure (i0==0) or the other way around
         i0 = np.where(diff_state.flatten()==1)[0]//64
         i1 = np.where(diff_state[i0,:].flatten()==-1)[0]
         i2 = np.where(diff_state[i0,:].flatten()==1)[0]
+
+        if i1.shape[0]>1 or i2.shape[0]>1:
+            return None, None
+
         return ((i1//8,i1%8), (i2//8,i2%8))
     elif compare_value == 3:
         # determine if valid Rochade

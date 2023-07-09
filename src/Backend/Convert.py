@@ -7,7 +7,7 @@ class Convert:
         for posx in range(0, 9):
             if x <= (posx * 55):
                 break
-        for posy in range(0, 9):
+        for posy in range(0, 8):
             if y >= (385 - posy * 55):
                 break
         print(posx, posy)
