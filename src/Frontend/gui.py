@@ -8,6 +8,7 @@ import Backend.Figuren as fig
 import Backend.Convert as con
 import Backend.VidIn as vi
 import threading as th
+import numpy as np
 import cv2
 from time import sleep
 
@@ -18,6 +19,7 @@ class GUI:
         self.abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + "/img/"
 
         self.clickEvent = ClickEvent(self)
+        self.option = True
 
         self.goBackBool = False
         self.count = 0
@@ -61,9 +63,22 @@ class GUI:
         self.canvas_trenn.place(x=790, y=150)
 
         # Fenster mit Video Input
-        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
-        self.canvas_vidin.place(x=890, y=200)
         self.vid = vi.VidIn(self)
+        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
+
+
+        self.vidb = tk.Canvas(self.root, bg='black', width=200, height=200)
+        self.vidb.place(x=880, y=450)
+
+        self.vidw = tk.Canvas(self.root, bg='black', width=200, height=200)
+        self.vidw.place(x=880, y=200)
+
+        self.slider1 = tk.Scale(self.root, from_=30, to=100, command=self.switchw)
+        self.slider1.place(x=1100, y=200)
+
+        self.slider2 = tk.Scale(self.root, from_=110, to=140, command=self.switchb)
+        self.slider2.place(x=1100, y=450)
+
         th.Thread(target=lambda: self.start()).start()
 
         # Erstellen des Schachbretthintergrundes
@@ -89,6 +104,11 @@ class GUI:
         button_next["text"] = ">"
         button_next["font"] = "Century-Gothic, 24"
         button_next.place(x=325, y=650, height=50, width=70)
+
+        self.button_option = tk.Button(self.root, command=lambda: self.switchoption())
+        self.button_option["text"] = "Apply"
+        self.button_option["font"] = "Century-Gothic, 18"
+        self.button_option.place(x=890, y=700, height=50, width=145)
 
         button_tipps = tk.Button(self.root, command=lambda: self.tipp())
         button_tipps["text"] = "Tipps"
@@ -155,6 +175,38 @@ class GUI:
         self.canvas.delete(self.rect)
         self.vid.restart(self)
 
+    # switcht zwischen großer Ausgabe des Produktes und Optionen um die Farbmasken Einstellunge zu ändern
+    def switchoption(self):
+        if self.option:
+            self.option = False
+            self.vidn()
+            self.button_option["text"] = "Option"
+            self.vid.switchoption()
+
+        else:
+            self.option = True
+            self.vido()
+            self.button_option["text"] = "Apply"
+            self.vid.switchoption()
+
+    def vidn(self):
+        self.canvas_vidin.place(x=890, y=200)
+        self.vidb.place_forget()
+        self.vidw.place_forget()
+        self.slider1.place_forget()
+        self.slider2.place_forget()
+
+    def vido(self):
+        self.canvas_vidin.place_forget()
+        self.vidb.place(x=880, y=450)
+        self.vidw.place(x=880, y=200)
+        self.slider1.place(x=1100, y=200)
+        self.slider2.place(x=1100, y=450)
+
+    def switchw(self, e):
+        self.vid.lower_white = np.array([0, 40, e])
+    def switchb(self, e):
+        self.vid.upper_black = np.array([255, 255, e])
 
 ########################################################################################################################
     # VisualFeedback
@@ -179,13 +231,21 @@ class GUI:
             self.root.after(15, self.update())
 
     def update(self):
-        ret, frame = self.vid.get_frame()
+        ret, frame1, frame2 = self.vid.get_frame()
 
         if ret:
-            frame = Image.fromarray(frame)
-            frame = frame.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
-            self.photo = ImageTk.PhotoImage(image=frame)
-            self.canvas_vidin.create_image(0, 0, image=self.photo, anchor=tk.NW)
+                frame1 = Image.fromarray(frame1)
+                frame1 = frame1.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
+                self.photo1 = ImageTk.PhotoImage(image=frame1)
+                if self.option and (not frame2 is None):
+                    print("yeah")
+                    frame2 = Image.fromarray(frame2)
+                    frame2 = frame2.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
+                    self.photo2 = ImageTk.PhotoImage(image=frame2)
+                    self.vidw.create_image(0, 0, image=self.photo1, anchor=tk.NW)
+                    self.vidb.create_image(0, 0, image=self.photo2, anchor=tk.NW)
+                else:
+                    self.canvas_vidin.create_image(0, 0, image=self.photo1, anchor=tk.NW)
 
     def callback(self, e):
         if not self.goBackBool:

@@ -10,12 +10,8 @@ def preprocessing(img):
 
     return img_threshold
 
-def preprocessing_figs(img):
+def preprocessing_figs(img, lower_black, upper_black, lower_white, upper_white):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower_black = np.array([0, 0, 0])
-    upper_black = np.array([255, 230, 21])
-    lower_white = np.array([0, 40, 125])
-    upper_white = np.array([20, 255, 255])
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
     mask_white = cv2.inRange(img_hsv, lower_white, upper_white)

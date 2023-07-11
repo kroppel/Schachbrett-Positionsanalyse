@@ -18,6 +18,18 @@ class VidIn:
         self.last_figure_state = np.concatenate((np.vstack((np.zeros((6,8)), np.ones((2,8))))[np.newaxis,:],np.vstack((np.ones((2,8)), np.zeros((6,8))))[np.newaxis,:]), axis=0)
         self.new_figure_state = None
         self.compare_state_counter = FRAME_COUNTER_THRESHOLD
+        self.option = True
+
+        self.lower_black = np.array([0, 0, 0])
+        self.upper_black = np.array([255, 255, 65])
+        self.lower_white = np.array([0, 40, 135])
+        self.upper_white = np.array([25, 255, 255])
+
+        """ Farbmasken Schachbrett Papier
+        lower_black = np.array([0, 0, 0])
+        upper_black = np.array([255, 255, 45])
+        lower_white = np.array([0, 40, 125])
+        upper_white = np.array([25, 255, 255])"""
 
     def restart(self, gui, video_source=0):
         self.vid = cv2.VideoCapture(video_source)
@@ -65,9 +77,11 @@ class VidIn:
                     intersections = get_intersections(h_lines, v_lines)
                     if not intersections is None:
                         img_display = draw_lines(img, h_lines + v_lines)
-                        img_black, img_white = preprocessing_figs(img)
+                        img_black, img_white = \
+                        preprocessing_figs(img, self.lower_black, self.upper_black, self.lower_white, self.upper_white)
 
-                        #return ret, cv2.cvtColor(img_white, cv2.COLOR_BGR2RGB)
+                        if self.option:
+                            return ret, cv2.cvtColor(img_white, cv2.COLOR_BGR2RGB), cv2.cvtColor(img_black, cv2.COLOR_BGR2RGB)
 
                         fields_white = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
                         fields_black = np.ndarray((intersections.shape[0]-1,intersections.shape[1]-1), dtype=np.ndarray)
@@ -120,18 +134,24 @@ class VidIn:
                                 self.new_figure_state = None
 
 
-                        return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB)
+                        return ret, cv2.cvtColor(img_display, cv2.COLOR_BGR2RGB), None
 
-                    return ret, cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    return ret, cv2.cvtColor(img, cv2.COLOR_BGR2RGB), None
 
                 else:
-                    return ret, img
+                    return ret, img, None
             
             else:
-                return ret, cv2.cvtColor(np.zeros((800,800)), cv2.COLOR_BGR2RGB)
+                return ret, cv2.cvtColor(np.zeros((800,800)), cv2.COLOR_BGR2RGB), None
 
     def get_points(self, event, x, y, flags, points):
         if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
             points.append([x, y])
+
+    def switchoption(self):
+        if self.option:
+            self.option=False
+        else:
+            self.option=True
 
 
