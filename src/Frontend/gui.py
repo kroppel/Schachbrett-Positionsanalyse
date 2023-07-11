@@ -73,10 +73,12 @@ class GUI:
         self.vidw = tk.Canvas(self.root, bg='black', width=200, height=200)
         self.vidw.place(x=880, y=200)
 
-        self.slider1 = tk.Scale(self.root, from_=30, to=100, command=self.switchw)
+        self.slider1 = tk.Scale(self.root, from_=0, to=255, command=self.switchw)
+        self.slider1.set(135)
         self.slider1.place(x=1100, y=200)
 
-        self.slider2 = tk.Scale(self.root, from_=110, to=140, command=self.switchb)
+        self.slider2 = tk.Scale(self.root, from_=0, to=255, command=self.switchb)
+        self.slider2.set(65)
         self.slider2.place(x=1100, y=450)
 
         th.Thread(target=lambda: self.start()).start()
@@ -142,6 +144,7 @@ class GUI:
 ########################################################################################################################
     # Button Functions
     def tipp(self):
+        self.deleteArrow()
         t1 = int(time.time()*1000)
         result = str(self.clickEvent.tipp())
         t2 = int(time.time()*1000)
@@ -166,6 +169,7 @@ class GUI:
         self.goBackBool = False
         self.count = 0
 
+        self.deleteArrow()
         self.Figures = []
         self.my_listbox.delete(1, tk.END)
         self.listend = 0
@@ -204,9 +208,9 @@ class GUI:
         self.slider2.place(x=1100, y=450)
 
     def switchw(self, e):
-        self.vid.lower_white = np.array([0, 40, e])
+        self.vid.lower_white = np.array([0, 40, int(e)])
     def switchb(self, e):
-        self.vid.upper_black = np.array([255, 255, e])
+        self.vid.upper_black = np.array([255, 255, int(e)])
 
 ########################################################################################################################
     # VisualFeedback
@@ -223,7 +227,8 @@ class GUI:
         self.arrow = self.canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill="green", width=4)
 
     def deleteArrow(self):
-        self.canvas.delete(self.arrow)
+        if not self.arrow is None:
+            self.canvas.delete(self.arrow)
 
 ########################################################################################################################
     def start(self):
@@ -235,16 +240,17 @@ class GUI:
 
         if ret:
                 frame1 = Image.fromarray(frame1)
-                frame1 = frame1.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
-                self.photo1 = ImageTk.PhotoImage(image=frame1)
                 if self.option and (not frame2 is None):
-                    print("yeah")
+                    frame1 = frame1.resize((200, 200), Image.ANTIALIAS)  # muss noch umgeändert werden
+                    self.photo1 = ImageTk.PhotoImage(image=frame1)
                     frame2 = Image.fromarray(frame2)
-                    frame2 = frame2.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
+                    frame2 = frame2.resize((200, 200), Image.ANTIALIAS)  # muss noch umgeändert werden
                     self.photo2 = ImageTk.PhotoImage(image=frame2)
                     self.vidw.create_image(0, 0, image=self.photo1, anchor=tk.NW)
                     self.vidb.create_image(0, 0, image=self.photo2, anchor=tk.NW)
                 else:
+                    frame1 = frame1.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
+                    self.photo1 = ImageTk.PhotoImage(image=frame1)
                     self.canvas_vidin.create_image(0, 0, image=self.photo1, anchor=tk.NW)
 
     def callback(self, e):
