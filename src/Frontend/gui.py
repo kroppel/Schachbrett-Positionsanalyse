@@ -179,7 +179,7 @@ class GUI:
             self.root.after(15, self.update())
 
     def update(self):
-        ret, frame = self.vid.get_frame()
+        ret, frame = self.vid.getFrame()
 
         if ret:
             frame = Image.fromarray(frame)

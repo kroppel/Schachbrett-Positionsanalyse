@@ -10,7 +10,7 @@ def preprocessing(img):
 
     return img_threshold
 
-def preprocessing_figs(img):
+def preprocessingFigures(img):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower_black = np.array([0, 0, 0])
     upper_black = np.array([255, 230, 21])
@@ -26,12 +26,12 @@ def preprocessing_figs(img):
     return mask_black, mask_white
 
 
-def resize_image(img, factor):
+def resizeImage(img, factor):
     return cv2.resize(img, (int(img.shape[1]*factor), int(img.shape[0]*factor)), interpolation = cv2.INTER_LINEAR)
 
 # Draws the given lines onto a copy of the given image
 # and returns it
-def draw_lines(img, lines):
+def drawLines(img, lines):
     if lines is None:
         return img
 
@@ -51,7 +51,7 @@ def draw_lines(img, lines):
 
     return img_lines
 
-def draw_points(img, points):
+def drawPoints(img, points):
     if points is None:
         return img
 
@@ -62,7 +62,7 @@ def draw_points(img, points):
 
     return img_points
 
-def extract_lines(img):
+def extractLines(img):
     # Parameters for setting an interval, in which the number of retrieved lines has to lie
     n = int((img.shape[1] * 0.8) / 8) # n: Pixel size of the field of a figure. Chess Board should fill about 80% of image width
     max_deviation = 20
@@ -80,9 +80,9 @@ def extract_lines(img):
     return lines
 
 # Filters out irrelevant lines (non-horizontal/non-vertical/duplicate)
-def filter_lines(lines):
+def filterLines(lines):
     # Removes lines that are neither horizontally nor vertically aligned
-    def get_horizontal_and_vertical_lines(lines):
+    def getHorizontalAndVerticalLines(lines):
         vertical_lines=[]
         horizontal_lines=[]
 
@@ -98,7 +98,7 @@ def filter_lines(lines):
 
     # Removes lines that are probably duplicates and returns
     # the remaining ones
-    def remove_duplicate_lines(lines):
+    def removeDuplicateLines(lines):
         d_lines = []
         for line in lines:
             rho, theta = line
@@ -114,7 +114,7 @@ def filter_lines(lines):
     # Removes lines that are probably not part of the 
     # chess playing field and returns the remaining ones
     # (Based on their distance, etc)
-    def keep_chess_lines(lines):
+    def keepChessLines(lines):
         lines.sort()
         chess_lines = lines
         deviation = 10000
@@ -149,20 +149,20 @@ def filter_lines(lines):
         return None, None
 
     # Keep horizontal/vertical lines
-    horizontal_lines, vertical_lines = get_horizontal_and_vertical_lines(lines)
+    horizontal_lines, vertical_lines = getHorizontalAndVerticalLines(lines)
 
     # Filter out similar lines
-    horizontal_lines = remove_duplicate_lines(horizontal_lines)
-    vertical_lines = remove_duplicate_lines(vertical_lines)
+    horizontal_lines = removeDuplicateLines(horizontal_lines)
+    vertical_lines = removeDuplicateLines(vertical_lines)
 
-    horizontal_lines = keep_chess_lines(horizontal_lines)
-    vertical_lines = keep_chess_lines(vertical_lines)
+    horizontal_lines = keepChessLines(horizontal_lines)
+    vertical_lines = keepChessLines(vertical_lines)
 
     return horizontal_lines, vertical_lines
 
 # Computes the intersections of each horizontal line
 # with each vertical line
-def get_intersections(h_lines, v_lines):
+def getIntersections(h_lines, v_lines):
     if (len(h_lines) != 9) or (len(v_lines) != 9):
         return None
 
@@ -187,7 +187,7 @@ def get_intersections(h_lines, v_lines):
 
     return intersections
 
-def detect_figure_in_field(field):
+def detectFigureInField(field):
     pruning_size = 15
     field_detection_threshold = field.shape[0]*field.shape[1]/42
     # field edge pruning
@@ -205,16 +205,16 @@ def detect_figure_in_field(field):
     return False
 
 
-def get_figures_in_fields(fields_black, fields_white):
+def getFiguresInFields(fields_black, fields_white):
     figures = np.zeros((2, fields_black.shape[0], fields_black.shape[1]))
 
     for i in np.arange(fields_black.shape[0]):
         for j in np.arange(fields_black.shape[1]):
             field_black = fields_black[i,j]
             field_white = fields_white[i,j]
-            if detect_figure_in_field(field_black):
+            if detectFigureInField(field_black):
                 figures[1,i,j] = 1
-            elif detect_figure_in_field(field_white):
+            elif detectFigureInField(field_white):
                 figures[0,i,j] = 1
     
     return figures
@@ -224,7 +224,7 @@ def get_figures_in_fields(fields_black, fields_white):
 # 0  : no change
 # 1  : figure moved
 # 2  : figure beaten
-def compare_states(last_state, current_state):
+def compareStates(last_state, current_state):
     # detect difference between last state and current state
     diff_state = current_state - last_state
 
@@ -252,7 +252,7 @@ def compare_states(last_state, current_state):
         return -1, diff_state
     
 
-def get_move_coordinates(compare_value, diff_state):
+def getMoveCoordinates(compare_value, diff_state):
     if DEBUG:
         print("Diff State:" + str(diff_state))
         print("Cmp Value:" + str(compare_value))

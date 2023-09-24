@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
-from Backend.image_processing import preprocessing, preprocessing_figs, draw_lines, extract_lines, filter_lines, get_intersections, draw_points, \
-                                     resize_image, get_figures_in_fields, compare_states, get_move_coordinates
+from Backend.ImageProcessing import preprocessing, preprocessingFigures, drawLines, extractLines, filterLines, getIntersections, drawPoints, \
+                                     resizeImage, getFiguresInFields, compareStates, getMoveCoordinates
 import sys
 from time import sleep
 import threading as th
@@ -32,9 +32,9 @@ class VidIn:
         if self.vid.isOpened():
             while len(self.pts1) < 4:
                 ret, img = self.vid.read()
-                img = resize_image(img, 1.5)
+                img = resizeImage(img, 1.5)
                 cv2.imshow("Input", img)
-                cv2.setMouseCallback("Input", self.get_points, self.pts1)
+                cv2.setMouseCallback("Input", self.getPoints, self.pts1)
                 if not cv2.waitKey(1) < 0:
                     break
             self.pts1 = np.float32(self.pts1)
@@ -51,21 +51,21 @@ class VidIn:
 
             cv2.destroyAllWindows()
 
-    def get_frame(self):
+    def getFrame(self):
         if self.vid.isOpened():
             ret, img = self.vid.read()
-            img = resize_image(img, 1.5)
+            img = resizeImage(img, 1.5)
 
             if ret:
                 img = cv2.warpPerspective(img, self.M, (800, 800))
                 img_threshold = preprocessing(img)
-                h_lines, v_lines = filter_lines(extract_lines(img_threshold))
+                h_lines, v_lines = filterLines(extractLines(img_threshold))
 
                 if not h_lines is None and not v_lines is None:
-                    intersections = get_intersections(h_lines, v_lines)
+                    intersections = getIntersections(h_lines, v_lines)
                     if not intersections is None:
-                        img_display = draw_lines(img, h_lines + v_lines)
-                        img_black, img_white = preprocessing_figs(img)
+                        img_display = drawLines(img, h_lines + v_lines)
+                        img_black, img_white = preprocessingFigures(img)
 
                         #return ret, cv2.cvtColor(img_white, cv2.COLOR_BGR2RGB)
 
@@ -78,10 +78,10 @@ class VidIn:
                                 fields_black[i,j] = img_black[int(intersections[i,j][1]):int(intersections[i+1,j+1][1]), int(intersections[i,j][0]):int(intersections[i+1,j+1][0])]                        
                         
                         # get current figure state
-                        figs = get_figures_in_fields(fields_black, fields_white)
+                        figs = getFiguresInFields(fields_black, fields_white)
                         print(figs)
                         # compare current figure state with last saved figure state
-                        ret_compare_last, diff_state_last = compare_states(self.last_figure_state, figs)
+                        ret_compare_last, diff_state_last = compareStates(self.last_figure_state, figs)
 
                         # reset counter if figure state invalid or not changed
                         if ret_compare_last <= 0:
@@ -91,7 +91,7 @@ class VidIn:
                             if self.new_figure_state is None:
                                 self.new_figure_state = figs
                             else:
-                                ret_compare_new, diff_state_new =  compare_states(self.new_figure_state, figs)
+                                ret_compare_new, diff_state_new =  compareStates(self.new_figure_state, figs)
                                 # new state has changed -> reset counter
                                 if ret_compare_new != 0:
                                     self.new_figure_state = None
@@ -101,7 +101,7 @@ class VidIn:
                                     self.compare_state_counter -= 1
 
                         if self.compare_state_counter == 0:
-                            p1, p2 = get_move_coordinates(ret_compare_last, diff_state_last)
+                            p1, p2 = getMoveCoordinates(ret_compare_last, diff_state_last)
                             move_valid_gui = False
 
                             if ret_compare_last != -1 and not (p1 is None):
@@ -130,7 +130,7 @@ class VidIn:
             else:
                 return ret, cv2.cvtColor(np.zeros((800,800)), cv2.COLOR_BGR2RGB)
 
-    def get_points(self, event, x, y, flags, points):
+    def getPoints(self, event, x, y, flags, points):
         if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
             points.append([x, y])
 
