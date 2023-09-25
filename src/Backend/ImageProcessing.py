@@ -3,6 +3,15 @@ import numpy as np
 
 DEBUG = False
 
+
+"""Preprocess input image with adaptive threshold method to obtain binary image similar to gradient image
+
+Params:
+    img (np.ndarray): the input image
+
+Returns:
+    img_threshold (np.ndarray): the processed image
+"""
 def preprocessing(img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                 # Convert the input image to a grayscale
     img_threshold = cv2.adaptiveThreshold(src=img_gray, maxValue=255, \
@@ -10,7 +19,21 @@ def preprocessing(img):
 
     return img_threshold
 
+<<<<<<< Updated upstream
 def preprocessingFigures(img, lower_black, upper_black, lower_white, upper_white):
+=======
+"""Preprocess input image of the chess playing field to obtain two masked images for black and white figures respectively.
+   The color masks are given by the lower and upper bound variables inside the function. 
+
+Params:
+    img (np.ndarray): the input image
+
+Returns:
+    mask_black (np.ndarray): the masked image for black figures
+    mask_white (np.ndarray): the masked image for white figures
+"""
+def preprocessingFigures(img):
+>>>>>>> Stashed changes
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
@@ -21,7 +44,15 @@ def preprocessingFigures(img, lower_black, upper_black, lower_white, upper_white
 
     return mask_black, mask_white
 
+"""Resize a given image by a factor.
 
+Params:
+    img (np.ndarray): the input image
+    factor (float): the factor by which the image is resized
+
+Returns:
+     (np.ndarray): the resized image
+"""
 def resizeImage(img, factor):
     return cv2.resize(img, (int(img.shape[1]*factor), int(img.shape[0]*factor)), interpolation = cv2.INTER_LINEAR)
 
