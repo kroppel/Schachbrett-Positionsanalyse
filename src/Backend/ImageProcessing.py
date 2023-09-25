@@ -10,7 +10,7 @@ def preprocessing(img):
 
     return img_threshold
 
-def preprocessing_figs(img, lower_black, upper_black, lower_white, upper_white):
+def preprocessingFigures(img, lower_black, upper_black, lower_white, upper_white):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
