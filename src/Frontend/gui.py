@@ -237,7 +237,7 @@ class GUI:
 
     def update(self):
 
-        ret, frame1, frame2 = self.vid.get_frame()
+        ret, frame1, frame2 = self.vid.getFrame()
 
         if ret:
                 frame1 = Image.fromarray(frame1)
