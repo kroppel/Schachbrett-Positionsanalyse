@@ -19,9 +19,7 @@ def preprocessing(img):
 
     return img_threshold
 
-<<<<<<< Updated upstream
-def preprocessingFigures(img, lower_black, upper_black, lower_white, upper_white):
-=======
+
 """Preprocess input image of the chess playing field to obtain two masked images for black and white figures respectively.
    The color masks are given by the lower and upper bound variables inside the function. 
 
@@ -33,7 +31,6 @@ Returns:
     mask_white (np.ndarray): the masked image for white figures
 """
 def preprocessingFigures(img):
->>>>>>> Stashed changes
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
