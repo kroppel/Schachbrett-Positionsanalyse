@@ -14,9 +14,10 @@ from time import sleep
 
 
 class GUI:
-
     def __init__(self=None):
-        self.abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + "/img/"
+        self.abs_path = (
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) + "/img/"
+        )
 
         self.clickEvent = ClickEvent(self)
         self.option = True
@@ -24,7 +25,7 @@ class GUI:
         self.goBackBool = False
         self.count = 0
 
-        self.arrow = None;
+        self.arrow = None
 
         self.rect = None
 
@@ -42,8 +43,14 @@ class GUI:
         start_text["font"] = "Arial 30 underline"
         start_text.place(x=430, y=0, height=100, width=450)
 
-        self.canvas = tk.Canvas(self.root, bg="black", width=438, height=438, highlightthickness=2,
-                                highlightbackground="#04d9ff")
+        self.canvas = tk.Canvas(
+            self.root,
+            bg="black",
+            width=438,
+            height=438,
+            highlightthickness=2,
+            highlightbackground="#04d9ff",
+        )
         self.canvas.place(x=100, y=200)
 
         self.output_text = tk.Label(self.root)
@@ -64,13 +71,12 @@ class GUI:
 
         # Fenster mit Video Input
         self.vid = vi.VidIn(self)
-        self.canvas_vidin = tk.Canvas(self.root, bg='black', width=437, height=437)
+        self.canvas_vidin = tk.Canvas(self.root, bg="black", width=437, height=437)
 
-
-        self.vidb = tk.Canvas(self.root, bg='black', width=200, height=200)
+        self.vidb = tk.Canvas(self.root, bg="black", width=200, height=200)
         self.vidb.place(x=880, y=450)
 
-        self.vidw = tk.Canvas(self.root, bg='black', width=200, height=200)
+        self.vidw = tk.Canvas(self.root, bg="black", width=200, height=200)
         self.vidw.place(x=880, y=200)
 
         self.slider1 = tk.Scale(self.root, from_=0, to=255, command=self.switchw)
@@ -118,18 +124,22 @@ class GUI:
         button_tipps.place(x=400, y=650, height=50, width=145)
 
         # Erstellen des Buchstaben Randes
-        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        letters = ["A", "B", "C", "D", "E", "F", "G", "H"]
         for i in range(0, 8):
-            tk.Label(self.root, text=8 - i, font='Century-Gothic, 20').place(x=75, y=218 + i * 55, height=25,
-                                                                                  width=25)
-            tk.Label(self.root, text=letters[i], font='Century-Gothic, 20').place(x=118 + i * 55, y=175, height=25, width=25)
+            tk.Label(self.root, text=8 - i, font="Century-Gothic, 20").place(
+                x=75, y=218 + i * 55, height=25, width=25
+            )
+            tk.Label(self.root, text=letters[i], font="Century-Gothic, 20").place(
+                x=118 + i * 55, y=175, height=25, width=25
+            )
 
         # Trennlinie
         self.canvas_trenn.create_line(9, 5, 9, 605, width=2)
 
         # Überschrift Video Input Canvas
-        tk.Label(self.root, text='Camera Video Input:', font='Century-Gothic, 20').place(x=885, y=180, height=20,
-                                                                                         width=200)
+        tk.Label(
+            self.root, text="Camera Video Input:", font="Century-Gothic, 20"
+        ).place(x=885, y=180, height=20, width=200)
 
         # Figuren erstellen:
         self.fig = fig.Figuren(None, None, None, None, None)
@@ -141,18 +151,22 @@ class GUI:
         # Mainloop starten
         self.root.mainloop()
 
-########################################################################################################################
+    ########################################################################################################################
     # Button Functions
     def tipp(self):
         self.deleteArrow()
-        t1 = int(time.time()*1000)
+        t1 = int(time.time() * 1000)
         result = str(self.clickEvent.tipp())
-        t2 = int(time.time()*1000)
-        self.changeOutput(result+" ("+str(t2-t1)+" ms)")
+        t2 = int(time.time() * 1000)
+        self.changeOutput(result + " (" + str(t2 - t1) + " ms)")
 
         # result to Coordinates:
-        x1, y1 = con.Convert().convFiePos(con.Convert().convLetFie(result[0]), int(result[1]))
-        x2, y2 = con.Convert().convFiePos(con.Convert().convLetFie(result[2]), int(result[3]))
+        x1, y1 = con.Convert().convFiePos(
+            con.Convert().convLetFie(result[0]), int(result[1])
+        )
+        x2, y2 = con.Convert().convFiePos(
+            con.Convert().convLetFie(result[2]), int(result[3])
+        )
 
         # draw the arrow
         self.drawArrow(x1, y1, x2, y2)
@@ -161,9 +175,9 @@ class GUI:
         self.clickEvent = ClickEvent(self)
         # löschen aller aktiven images
         for i in range(1, 9):
-            for j in range(1,9):
-                self.canvas.delete(self.img_id[i*10+j])
-                self.img_id[i*10+j] = None
+            for j in range(1, 9):
+                self.canvas.delete(self.img_id[i * 10 + j])
+                self.img_id[i * 10 + j] = None
 
         self.createImgs()
         self.goBackBool = False
@@ -209,10 +223,11 @@ class GUI:
 
     def switchw(self, e):
         self.vid.lower_white = np.array([0, 40, int(e)])
+
     def switchb(self, e):
         self.vid.upper_black = np.array([255, 255, int(e)])
 
-########################################################################################################################
+    ########################################################################################################################
     # VisualFeedback
     def changeOutput(self, string):
         self.output_text.config(text=string)
@@ -224,35 +239,42 @@ class GUI:
         self.canvas.config(highlightbackground="#04d9ff")
 
     def drawArrow(self, x1, y1, x2, y2):
-        self.arrow = self.canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill="green", width=4)
+        self.arrow = self.canvas.create_line(
+            x1, y1, x2, y2, arrow=tk.LAST, fill="green", width=4
+        )
 
     def deleteArrow(self):
         if not self.arrow is None:
             self.canvas.delete(self.arrow)
 
-########################################################################################################################
+    ########################################################################################################################
     def start(self):
-        while (True):
+        while True:
             self.root.after(15, self.update())
 
     def update(self):
-
         ret, frame1, frame2 = self.vid.getFrame()
 
         if ret:
-                frame1 = Image.fromarray(frame1)
-                if self.option and (not frame2 is None):
-                    frame1 = frame1.resize((200, 200), Image.ANTIALIAS)  # muss noch umgeändert werden
-                    self.photo1 = ImageTk.PhotoImage(image=frame1)
-                    frame2 = Image.fromarray(frame2)
-                    frame2 = frame2.resize((200, 200), Image.ANTIALIAS)  # muss noch umgeändert werden
-                    self.photo2 = ImageTk.PhotoImage(image=frame2)
-                    self.vidw.create_image(0, 0, image=self.photo1, anchor=tk.NW)
-                    self.vidb.create_image(0, 0, image=self.photo2, anchor=tk.NW)
-                else:
-                    frame1 = frame1.resize((440, 440), Image.ANTIALIAS)  # muss noch umgeändert werden
-                    self.photo1 = ImageTk.PhotoImage(image=frame1)
-                    self.canvas_vidin.create_image(0, 0, image=self.photo1, anchor=tk.NW)
+            frame1 = Image.fromarray(frame1)
+            if self.option and (not frame2 is None):
+                frame1 = frame1.resize(
+                    (200, 200), Image.ANTIALIAS
+                )  # muss noch umgeändert werden
+                self.photo1 = ImageTk.PhotoImage(image=frame1)
+                frame2 = Image.fromarray(frame2)
+                frame2 = frame2.resize(
+                    (200, 200), Image.ANTIALIAS
+                )  # muss noch umgeändert werden
+                self.photo2 = ImageTk.PhotoImage(image=frame2)
+                self.vidw.create_image(0, 0, image=self.photo1, anchor=tk.NW)
+                self.vidb.create_image(0, 0, image=self.photo2, anchor=tk.NW)
+            else:
+                frame1 = frame1.resize(
+                    (440, 440), Image.ANTIALIAS
+                )  # muss noch umgeändert werden
+                self.photo1 = ImageTk.PhotoImage(image=frame1)
+                self.canvas_vidin.create_image(0, 0, image=self.photo1, anchor=tk.NW)
 
     def callback(self, e):
         if not self.goBackBool:
@@ -282,7 +304,9 @@ class GUI:
             self.count += 2
             # Moves festlegen
             string = (start, target[0], target[1])
-        elif ((figure1 == "p") | (figure1 == "P")) & ((target[1] == "8") | (target[1] == "1")):       # pawnPromotion
+        elif ((figure1 == "p") | (figure1 == "P")) & (
+            (target[1] == "8") | (target[1] == "1")
+        ):  # pawnPromotion
             print("PawnPromo")
             # speichern der Figur Typen
             self.Figures.append(figure1)
@@ -294,7 +318,7 @@ class GUI:
         else:
             # geben die id der geschlagenen Figur mit, damit er sie beim Zurückgehen wieder erstellen kann
             self.Figures.append(figure1)
-            if not(figure2 == "None"):
+            if not (figure2 == "None"):
                 self.Figures.append(figure2)
                 self.count += 2
                 string = (start[0], start[1], "-->", target[0], target[1], "!")
@@ -321,9 +345,9 @@ class GUI:
 
         print("String to handle: ", string)
 
-        if string != 'Züge:':
+        if string != "Züge:":
             if string[0] == "cg":
-                self.castling(string[1]+string[2], False)
+                self.castling(string[1] + string[2], False)
                 self.count -= 2
             elif string[0] == "pp":
                 x1 = con.Convert().convLetFie(string[1])
@@ -345,13 +369,17 @@ class GUI:
 
                 if not (piece2 == "None"):
                     img2 = self.getImg(piece2)
-                    self.img_id[y2 * 10 + x2] = self.canvas.create_image(pos2[0], pos2[1], image=self.img[img2])
+                    self.img_id[y2 * 10 + x2] = self.canvas.create_image(
+                        pos2[0], pos2[1], image=self.img[img2]
+                    )
 
                 self.canvas.delete(self.img_id[y1 * 10 + x1])
                 self.canvas.delete(self.img_id[y2 * 10 + x2])
 
                 # piece2 ist der geschlagene und steht daher auf x2 y2, piece1 der schlagende auf x1 y1
-                self.img_id[y1 * 10 + x1] = self.canvas.create_image(pos1[0], pos1[1], image=self.img[img1])
+                self.img_id[y1 * 10 + x1] = self.canvas.create_image(
+                    pos1[0], pos1[1], image=self.img[img1]
+                )
             else:
                 # gehe zurück
                 x1 = con.Convert().convLetFie(string[0])
@@ -379,10 +407,16 @@ class GUI:
                     img2 = self.getImg(piece2)
 
                     # piece2 ist der geschlagene und steht daher auf x2 y2, piece1 der schlagende auf x1 y1
-                    self.img_id[y1*10+x1] = self.canvas.create_image(pos1[0], pos1[1], image=self.img[img2])
-                    self.img_id[y2*10+x2] = self.canvas.create_image(pos2[0], pos2[1], image=self.img[img1])
+                    self.img_id[y1 * 10 + x1] = self.canvas.create_image(
+                        pos1[0], pos1[1], image=self.img[img2]
+                    )
+                    self.img_id[y2 * 10 + x2] = self.canvas.create_image(
+                        pos2[0], pos2[1], image=self.img[img1]
+                    )
                 else:
-                    self.img_id[y1*10+x1] = self.canvas.create_image(pos1[0], pos1[1], image=self.img[img1])
+                    self.img_id[y1 * 10 + x1] = self.canvas.create_image(
+                        pos1[0], pos1[1], image=self.img[img1]
+                    )
                     print("switch")
 
             self.goBackBool = True
@@ -403,7 +437,7 @@ class GUI:
             string = self.my_listbox.get(self.listakt)
 
             if string[0] == "cg":
-                self.castling(string[1]+string[2], True)
+                self.castling(string[1] + string[2], True)
                 self.count += 2
             elif string[0] == "pp":
                 pos1 = [con.Convert().convLetFie(string[1]), int(string[2])]
@@ -434,7 +468,9 @@ class GUI:
                 else:
                     self.count += 1
 
-                self.img_id[(y2 * 10 + x2)] = self.canvas.create_image(pos1[0], pos1[1], image=self.img[img1])
+                self.img_id[(y2 * 10 + x2)] = self.canvas.create_image(
+                    pos1[0], pos1[1], image=self.img[img1]
+                )
 
             if self.listakt == self.listend:
                 self.goBackBool = False
@@ -455,7 +491,9 @@ class GUI:
         self.changeOutput("Figur erkannt, wähle das Ziel")
         if not (self.rect is None):
             self.canvas.delete(self.rect)
-        self.rect = self.canvas.create_rectangle(x - 28, y - 28, x + 28, y + 28, width=2, outline="#04d9ff")
+        self.rect = self.canvas.create_rectangle(
+            x - 28, y - 28, x + 28, y + 28, width=2, outline="#04d9ff"
+        )
         return
 
     def illegalColor(self):
@@ -472,9 +510,9 @@ class GUI:
         self.ErrorOff()
         self.changeOutput("Zug durchgeführt")
 
-        xsavedPos = savedPos[1]*10+savedPos[0]
+        xsavedPos = savedPos[1] * 10 + savedPos[0]
 
-        xpos = pos[1]*10+pos[0]
+        xpos = pos[1] * 10 + pos[0]
         print(xsavedPos, xpos)
 
         # Pixel for Positions
@@ -494,54 +532,86 @@ class GUI:
             self.canvas.delete(self.rect)
             self.ErrorOff()
             self.changeOutput("Zug durchgeführt")
-        if pos[1] == "1":   # weißer König
+        if pos[1] == "1":  # weißer König
             if bool:
                 self.canvas.delete(self.img_id[15])
-            if pos[0] == "g":   # move nach rechts
+            if pos[0] == "g":  # move nach rechts
                 if bool:
                     self.canvas.delete(self.img_id[18])
                     # img erstellen
-                    self.img_id[17] = self.canvas.create_image(360, 415, image=self.img[4])
-                    self.img_id[16] = self.canvas.create_image(305, 415, image=self.img[0])
+                    self.img_id[17] = self.canvas.create_image(
+                        360, 415, image=self.img[4]
+                    )
+                    self.img_id[16] = self.canvas.create_image(
+                        305, 415, image=self.img[0]
+                    )
                 # unterscheiden in castling for oder zurück animation
                 else:
                     self.canvas.delete(self.img_id[16])
                     self.canvas.delete(self.img_id[17])
-                    self.img_id[18] = self.canvas.create_image(415, 415, image=self.img[0])
-                    self.img_id[15] = self.canvas.create_image(250, 415, image=self.img[4])
-            elif pos[0] == "c":     # move nach links
+                    self.img_id[18] = self.canvas.create_image(
+                        415, 415, image=self.img[0]
+                    )
+                    self.img_id[15] = self.canvas.create_image(
+                        250, 415, image=self.img[4]
+                    )
+            elif pos[0] == "c":  # move nach links
                 if bool:
                     self.canvas.delete(self.img_id[11])
-                    self.img_id[13] = self.canvas.create_image(140, 415, image=self.img[4])
-                    self.img_id[14] = self.canvas.create_image(195, 415, image=self.img[0])
+                    self.img_id[13] = self.canvas.create_image(
+                        140, 415, image=self.img[4]
+                    )
+                    self.img_id[14] = self.canvas.create_image(
+                        195, 415, image=self.img[0]
+                    )
                 else:
                     self.canvas.delete(self.img_id[13])
                     self.canvas.delete(self.img_id[14])
-                    self.img_id[11] = self.canvas.create_image(30, 415, image=self.img[0])
-                    self.img_id[15] = self.canvas.create_image(250, 415, image=self.img[4])
-        elif pos[1] == "8":    # schwarzer König
+                    self.img_id[11] = self.canvas.create_image(
+                        30, 415, image=self.img[0]
+                    )
+                    self.img_id[15] = self.canvas.create_image(
+                        250, 415, image=self.img[4]
+                    )
+        elif pos[1] == "8":  # schwarzer König
             if bool:
                 self.canvas.delete(self.img_id[85])
             if pos[0] == "g":
                 if bool:
                     self.canvas.delete(self.img_id[88])
-                    self.img_id[87] = self.canvas.create_image(360, 30, image=self.img[10])
-                    self.img_id[86] = self.canvas.create_image(305, 30, image=self.img[6])
+                    self.img_id[87] = self.canvas.create_image(
+                        360, 30, image=self.img[10]
+                    )
+                    self.img_id[86] = self.canvas.create_image(
+                        305, 30, image=self.img[6]
+                    )
                 else:
                     self.canvas.delete(self.img_id[87])
                     self.canvas.delete(self.img_id[86])
-                    self.img_id[88] = self.canvas.create_image(415, 30, image=self.img[6])
-                    self.img_id[85] = self.canvas.create_image(250,30, image=self.img[10])
+                    self.img_id[88] = self.canvas.create_image(
+                        415, 30, image=self.img[6]
+                    )
+                    self.img_id[85] = self.canvas.create_image(
+                        250, 30, image=self.img[10]
+                    )
             elif pos[0] == "c":
                 if bool:
                     self.canvas.delete(self.img_id[81])
-                    self.img_id[83] = self.canvas.create_image(140, 30, image=self.img[10])
-                    self.img_id[84] = self.canvas.create_image(195, 30, image=self.img[6])
+                    self.img_id[83] = self.canvas.create_image(
+                        140, 30, image=self.img[10]
+                    )
+                    self.img_id[84] = self.canvas.create_image(
+                        195, 30, image=self.img[6]
+                    )
                 else:
                     self.canvas.delete((self.img_id[83]))
                     self.canvas.delete((self.img_id[84]))
-                    self.img_id[81] = self.canvas.create_image(30, 30, image=self.img[6])
-                    self.img_id[85] = self.canvas.create_image(250, 30, image=self.img[10])
+                    self.img_id[81] = self.canvas.create_image(
+                        30, 30, image=self.img[6]
+                    )
+                    self.img_id[85] = self.canvas.create_image(
+                        250, 30, image=self.img[10]
+                    )
 
     def pawnPromo(self, spos, pos, bool):
         if not self.goBackBool:
@@ -557,32 +627,56 @@ class GUI:
         self.canvas.delete(self.img_id[spos[1] * 10 + spos[0]])
         if bool:
             if pos[1] == 8:
-                self.img_id[pos[1]*10+pos[0]] = self.canvas.create_image(xppos, yppos, image=self.img[3])
+                self.img_id[pos[1] * 10 + pos[0]] = self.canvas.create_image(
+                    xppos, yppos, image=self.img[3]
+                )
             else:
-                self.img_id[pos[1]*10+pos[0]] = self.canvas.create_image(xppos, yppos, image=self.img[9])
+                self.img_id[pos[1] * 10 + pos[0]] = self.canvas.create_image(
+                    xppos, yppos, image=self.img[9]
+                )
         else:
             if pos[1] == 8:
-                self.img_id[pos[1]*10+pos[0]] = self.canvas.create_image(xppos, yppos, image=self.img[5])
-                self.img_id[spos[1] * 10 + spos[0]] = self.canvas.create_image(xspos, yspos, image=self.img[9])
+                self.img_id[pos[1] * 10 + pos[0]] = self.canvas.create_image(
+                    xppos, yppos, image=self.img[5]
+                )
+                self.img_id[spos[1] * 10 + spos[0]] = self.canvas.create_image(
+                    xspos, yspos, image=self.img[9]
+                )
             else:
                 print("else")
-                self.img_id[pos[1]*10+pos[0]] = self.canvas.create_image(xppos, yppos, image=self.img[11])
-                self.img_id[spos[1]*10+spos[0]] = self.canvas.create_image(xspos, yspos, image=self.img[9])
+                self.img_id[pos[1] * 10 + pos[0]] = self.canvas.create_image(
+                    xppos, yppos, image=self.img[11]
+                )
+                self.img_id[spos[1] * 10 + spos[0]] = self.canvas.create_image(
+                    xspos, yspos, image=self.img[9]
+                )
 
     def getImg(self, piece):
         match str(piece):
-            case 'R': return 0
-            case 'N': return 1
-            case 'B': return 2
-            case 'Q': return 3
-            case 'K': return 4
-            case 'P': return 5
-            case 'r': return 6
-            case 'n': return 7
-            case 'b': return 8
-            case 'q': return 9
-            case 'k': return 10
-            case 'p': return 11
+            case "R":
+                return 0
+            case "N":
+                return 1
+            case "B":
+                return 2
+            case "Q":
+                return 3
+            case "K":
+                return 4
+            case "P":
+                return 5
+            case "r":
+                return 6
+            case "n":
+                return 7
+            case "b":
+                return 8
+            case "q":
+                return 9
+            case "k":
+                return 10
+            case "p":
+                return 11
         print("Error getImg")
 
     def illegalMove(self):
@@ -607,18 +701,18 @@ class GUI:
 
     def createImgs(self):
         self.img = [
-            None,   # RookW     0
-            None,   # KnightW   1
-            None,   # BishopW   2
-            None,   # QueenW    3
-            None,   # KingW     4
-            None,   # PawnW     5
-            None,   # RookB     6
-            None,   # KnightB   7
-            None,   # BishopB   8
-            None,   # QueenB    9
-            None,   # KingB     10
-            None,   # PawnB     11
+            None,  # RookW     0
+            None,  # KnightW   1
+            None,  # BishopW   2
+            None,  # QueenW    3
+            None,  # KingW     4
+            None,  # PawnW     5
+            None,  # RookB     6
+            None,  # KnightB   7
+            None,  # BishopB   8
+            None,  # QueenB    9
+            None,  # KingB     10
+            None,  # PawnB     11
         ]
 
         # Speicher Initialisieren Felder von 11 bis 18 bis 81 bis 88
@@ -679,7 +773,9 @@ class GUI:
         )
         self.img[5] = ImageTk.PhotoImage(pawn_w)
         for i in range(0, 8):
-            self.img_id[i + 21] = self.canvas.create_image(30 + i * 55, 360, image=self.img[5])
+            self.img_id[i + 21] = self.canvas.create_image(
+                30 + i * 55, 360, image=self.img[5]
+            )
         ################################################################################################################
         # Erstellen der schwarzen Figuren
         rook_b = (
@@ -732,5 +828,6 @@ class GUI:
         )
         self.img[11] = ImageTk.PhotoImage(pawn_b)
         for i in range(0, 8):
-            self.img_id[i + 71] = self.canvas.create_image(30 + i * 55, 85, image=self.img[11])
-
+            self.img_id[i + 71] = self.canvas.create_image(
+                30 + i * 55, 85, image=self.img[11]
+            )

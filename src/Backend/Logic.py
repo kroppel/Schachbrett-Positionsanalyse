@@ -5,7 +5,6 @@ from stockfish import Stockfish
 
 
 class Logic:
-
     def __init__(self, gui):
         # init new Game
         self.board = c.Board()
@@ -15,9 +14,12 @@ class Logic:
         self.finished = False
         self.gui = gui
         self.round = 0
-        #self.stock = Stockfish(path="/opt/homebrew/Cellar/stockfish/15.1/bin/stockfish", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
-        self.stock = Stockfish(path="C:/Users/konst/Downloads/stockfish_15.1_win_x64_popcnt/stockfish-windows-2022-x86-64-modern.exe", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
-
+        # self.stock = Stockfish(path="/opt/homebrew/Cellar/stockfish/15.1/bin/stockfish", depth=18, parameters={"Threads": 4, "Minimum Thinking Time": 30})
+        self.stock = Stockfish(
+            path="C:/Users/konst/Downloads/stockfish_15.1_win_x64_popcnt/stockfish-windows-2022-x86-64-modern.exe",
+            depth=18,
+            parameters={"Threads": 4, "Minimum Thinking Time": 30},
+        )
 
     # input of mouseClick
     def input(self, x, y):
@@ -63,7 +65,10 @@ class Logic:
             else:
                 # choose another piece
                 if piece:
-                    if self.save_color == self.board.piece_at(c.parse_square(l2 + str(pos[1]))).color:
+                    if (
+                        self.save_color
+                        == self.board.piece_at(c.parse_square(l2 + str(pos[1]))).color
+                    ):
                         print("other piece chosen")
                         self.saved_input = pos
                         self.saved_posl = posl
@@ -74,18 +79,22 @@ class Logic:
                 # convert to letter:
                 l1 = cv.convFieLet(self.saved_input[0])
                 # create the move
-                move = c.Move.from_uci(l1+str(self.saved_input[1])+l2+str(pos[1]))
+                move = c.Move.from_uci(l1 + str(self.saved_input[1]) + l2 + str(pos[1]))
 
                 # check legal Move
                 if move in self.board.legal_moves:
                     if self.board.is_castling(move):
                         # do something
                         self.gui.castling(posl, True)
-                        self.gui.insertItemInList("cg", posl, str(self.save_piece), None)
+                        self.gui.insertItemInList(
+                            "cg", posl, str(self.save_piece), None
+                        )
                     else:
                         # if legal move then
                         self.gui.legalMove(self.saved_input, pos, self.save_piece)
-                        self.gui.insertItemInList(self.saved_posl, posl, str(self.save_piece), str(piece))
+                        self.gui.insertItemInList(
+                            self.saved_posl, posl, str(self.save_piece), str(piece)
+                        )
                     print("legal Move")
                     self.board.push(move)
                     print(str(self.save_piece), str(piece))
@@ -95,17 +104,19 @@ class Logic:
                     ret_value = 1
                 # pawn promotion
                 elif c.Move.from_uci(str(move) + "q") in self.board.legal_moves:
-                        print("Pawn Promotion detected")
-                        # löschen die id von der Position und setzen einfach eine Dame darauf
-                        self.gui.pawnPromo(self.saved_input, pos, True)
-                        self.gui.insertItemInList(self.saved_posl, posl, str(self.save_piece), str(piece))
-                        print("legal Move")
-                        self.board.push(c.Move.from_uci(str(move) + "q"))
-                        print(str(self.save_piece), str(piece))
-                        self.saved_input = None
-                        self.save_color = None
-                        self.round += 1
-                        ret_value = 1
+                    print("Pawn Promotion detected")
+                    # löschen die id von der Position und setzen einfach eine Dame darauf
+                    self.gui.pawnPromo(self.saved_input, pos, True)
+                    self.gui.insertItemInList(
+                        self.saved_posl, posl, str(self.save_piece), str(piece)
+                    )
+                    print("legal Move")
+                    self.board.push(c.Move.from_uci(str(move) + "q"))
+                    print(str(self.save_piece), str(piece))
+                    self.saved_input = None
+                    self.save_color = None
+                    self.round += 1
+                    ret_value = 1
                 else:
                     # GUI Change
                     print("illegal Move")
@@ -130,10 +141,10 @@ class Logic:
             self.gui.check("Schach " + self.side)
 
     def _checkColor(self, color):
-        if(self.round % 2 == 0) and (color == c.WHITE):
+        if (self.round % 2 == 0) and (color == c.WHITE):
             self.side = "Schwarz"
             return True
-        elif(self.round % 2 == 1) and (color == c.BLACK):
+        elif (self.round % 2 == 1) and (color == c.BLACK):
             self.side = "Weiß"
             return True
         else:
@@ -142,18 +153,19 @@ class Logic:
     def _getFinished(self):
         return self.finished
 
-    scoring = {'p': -1,
-               'n': -3,
-               'b': -3,
-               'r': -5,
-               'q': -9,
-               'k': 0,
-               'P': 1,
-               'N': 3,
-               'B': 3,
-               'R': 5,
-               'Q': 9,
-               'K': 0,
+    scoring = {
+        "p": -1,
+        "n": -3,
+        "b": -3,
+        "r": -5,
+        "q": -9,
+        "k": 0,
+        "P": 1,
+        "N": 3,
+        "B": 3,
+        "R": 5,
+        "Q": 9,
+        "K": 0,
     }
 
     def eval_board(self, BOARD):
@@ -170,4 +182,3 @@ class Logic:
     def byStock(self):
         self.stock.set_fen_position(self.board.fen())
         return self.stock.get_best_move()
-

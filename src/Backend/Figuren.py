@@ -10,7 +10,7 @@ class Figuren:
 
     def countUp(self, x1, x2):
         arr = []
-        for i in range(x1, x2+1):
+        for i in range(x1, x2 + 1):
             arr.append(i)
         return arr
 
@@ -108,7 +108,6 @@ class Figuren:
             Rook(32, "b", 8, 8, 5),
         ]
 
-
     def getLists(self):
         return self.figures_black, self.figures_white
 
@@ -135,7 +134,9 @@ class Queen(Figuren):
     def Zug(self, x, y) -> bool | list:
         # self.printAll(x, y)
         # 1. bewegt sie sich wie ein Bishop:
-        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (
+            not ((self.posX == x) & (self.posY == y))
+        ):
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
             else:
@@ -210,7 +211,8 @@ class Knight(Figuren):
     def Zug(self, x, y) -> bool | list:
         # self.printAll(x, y)
         if ((abs(self.posX - x) == 1) & (abs(self.posY - y) == 2)) | (
-                ((abs(self.posX - x)) == 2) & (abs(self.posY - y) == 1)):
+            ((abs(self.posX - x)) == 2) & (abs(self.posY - y) == 1)
+        ):
             return True, []
         return False, []
 
@@ -223,13 +225,15 @@ class Bishop(Figuren):
     def Zug(self, x, y) -> bool | list:
         # self.printAll(x, y)
         # lassen erst überprüfen, ob der Zug überhaupt möglich wäre:
-        if (abs(self.posX - x) == (abs(self.posY - y))) & (not ((self.posX == x) & (self.posY == y))):
+        if (abs(self.posX - x) == (abs(self.posY - y))) & (
+            not ((self.posX == x) & (self.posY == y))
+        ):
             # wenn ja geben wir True und das Array mit allen dazwischen liegenden pos zurück
             if self.posX < x:
                 xs = self.countUp(self.posX, x)
             else:
                 xs = self.countDown(self.posX, x)
-            if  self.posY < y:
+            if self.posY < y:
                 ys = self.countUp(self.posY, y)
             else:
                 ys = self.countDown(self.posY, y)
@@ -258,7 +262,9 @@ class Pawn(Figuren):
                 return True, []
             # ansonsten darf er, wenn er noch nicht gerückt wurde einen zweier Sprung machen,
             # aber auch nur, wenn keine andere Figur dazwischen steht
-            elif ((not schlagen) & (not self.moved_b)) & ((self.posX == x) & ((self.posY - y == -2) | (self.posY - y == -1))):
+            elif ((not schlagen) & (not self.moved_b)) & (
+                (self.posX == x) & ((self.posY - y == -2) | (self.posY - y == -1))
+            ):
                 # posY ist kleier als y
                 ys = self.countUp(self.posY, y)
                 for i in range(0, len(ys)):
@@ -272,7 +278,9 @@ class Pawn(Figuren):
             if schlagen & ((abs(self.posX - x)) == 1) & (self.posY - y == 1):
                 self.moved_b = True
                 return True, []
-            elif ((not schlagen) & (not self.moved_b)) & ((self.posX == x) & ((self.posY - y == 2)|(self.posY - y == 1))):
+            elif ((not schlagen) & (not self.moved_b)) & (
+                (self.posX == x) & ((self.posY - y == 2) | (self.posY - y == 1))
+            ):
                 # posY ist größer als y
                 ys = self.countDown(self.posY, y)
                 for i in range(0, len(ys)):

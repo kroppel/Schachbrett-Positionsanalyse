@@ -13,9 +13,9 @@ class Checks:
 
     def idToPos(self, id):  # gibt die einer Figur zugehörige aktuelle Position wieder
         if id < 17:
-            return self.figures_white[id-1].getPos()
+            return self.figures_white[id - 1].getPos()
         else:
-            return self.figures_black[id-17].getPos()
+            return self.figures_black[id - 17].getPos()
 
     def checkRochade(self):
         return
@@ -25,11 +25,11 @@ class Checks:
 
     def getFigure(self, id):
         if id > 17:
-            return self.figures_black[id-17].retSelf()
+            return self.figures_black[id - 17].retSelf()
         else:
             return self.figures_white[id].retSelf()
 
-########################################################################################################################
+    ########################################################################################################################
     def checkGedeckt(self, pos):
         # wenn eine Figur oder ein Feld von einer gegnerischen Figur gedeckt wird, kann der König sie nicht schlagen bzw
         # dort hinziehen, um zu schauen, ob eine Figur gedeckt wird, muss man alle Figuren der gleich Farbe durchgehen
@@ -49,7 +49,11 @@ class Checks:
                 else:
                     answer, arr = self.figures_white[i].Zug(pos[0], pos[1])
                 # überprüfen der Antwort und des Arrays dazwischen
-                if answer & self.checkRoomBetween(arr) & self.figures_white[i].getActive():
+                if (
+                    answer
+                    & self.checkRoomBetween(arr)
+                    & self.figures_white[i].getActive()
+                ):
                     break
                 else:
                     answer = False
@@ -63,7 +67,11 @@ class Checks:
                 else:
                     answer, arr = self.figures_black[i].Zug(pos[0], pos[1])
                     # überprüfen der Antwort und des Arrays dazwischen
-                if answer & self.checkRoomBetween(arr) & self.figures_black[i].getActive():
+                if (
+                    answer
+                    & self.checkRoomBetween(arr)
+                    & self.figures_black[i].getActive()
+                ):
                     break
                 else:
                     answer = False
@@ -75,7 +83,7 @@ class Checks:
         # überprüfung fertig
         return answer
 
-########################################################################################################################
+    ########################################################################################################################
     # überprüft auf Schach
     def checkSchach(self, gui):
         # print("Check Schach")
@@ -117,7 +125,11 @@ class Checks:
                     else:
                         answer, arr = self.figures_black[i].Zug(pos[0], pos[1])
                     # überprüfen der Antwort und des Arrays dazwischen
-                    if answer & self.checkRoomBetween(arr) & self.figures_black[i].getActive():
+                    if (
+                        answer
+                        & self.checkRoomBetween(arr)
+                        & self.figures_black[i].getActive()
+                    ):
                         break
                     else:
                         answer = False
@@ -131,7 +143,11 @@ class Checks:
                     else:
                         answer, arr = self.figures_white[i].Zug(pos[0], pos[1])
                         # überprüfen der Antwort und des Arrays dazwischen
-                    if answer & self.checkRoomBetween(arr) & self.figures_white[i].getActive():
+                    if (
+                        answer
+                        & self.checkRoomBetween(arr)
+                        & self.figures_white[i].getActive()
+                    ):
                         break
                     else:
                         answer = False
@@ -144,14 +160,14 @@ class Checks:
         x = pos[0]
         y = pos[1]
         arr = [
-            [x, y + 1],         # oben
-            [x, y - 1],         # unten
-            [x - 1, y],         # links
-            [x + 1, y],         # rechts
-            [x - 1, y + 1],     # oben links
-            [x + 1, y + 1],     # oben rechts
-            [x - 1, y - 1],     # unten links
-            [x + 1, y - 1],     # unten rechts
+            [x, y + 1],  # oben
+            [x, y - 1],  # unten
+            [x - 1, y],  # links
+            [x + 1, y],  # rechts
+            [x - 1, y + 1],  # oben links
+            [x + 1, y + 1],  # oben rechts
+            [x - 1, y - 1],  # unten links
+            [x + 1, y - 1],  # unten rechts
         ]
         # print(arr)
         bool = False
@@ -160,9 +176,13 @@ class Checks:
             # checke bei jeder Position, ob eine Figur darauf steht:
             pos = (arr[i][0], arr[i][1])
             # print(arr[i])
-            if not (self.checkLists(pos, False)):  # wenn er eine Findet, bei der keine darauf steht
+            if not (
+                self.checkLists(pos, False)
+            ):  # wenn er eine Findet, bei der keine darauf steht
                 # dann schaut er, ob diese Position gedeckt wird
-                if not self.checkGedeckt(pos):      # wenn sie nicht gedeckt wird, gibt es noch einen Zug für den König
+                if not self.checkGedeckt(
+                    pos
+                ):  # wenn sie nicht gedeckt wird, gibt es noch einen Zug für den König
                     # wenn sie gedeckt wird und er keinen anderen Zug hat müssen wir noch überprüfen,
                     # ob eine unserer Figuren die Schach setzende Figur schlagen kann
                     if not self.checkSchlagen(pos):
@@ -180,9 +200,13 @@ class Checks:
 
         # wenn weißter bishop
         if (id == 3) | (id == 6):
-            answer, arr = self.figures_white[figure_num].Zug(save_pos[0] + 1, save_pos[1] + 1)
+            answer, arr = self.figures_white[figure_num].Zug(
+                save_pos[0] + 1, save_pos[1] + 1
+            )
             if not answer:
-                answer, arr = self.figures_white[figure_num].Zug(save_pos[0] - 1, save_pos[1] - 1)
+                answer, arr = self.figures_white[figure_num].Zug(
+                    save_pos[0] - 1, save_pos[1] - 1
+                )
             # theoretisch müsste es hier immer true sein
             if answer:
                 if self.checkSchach():
@@ -192,9 +216,13 @@ class Checks:
                 print("Error checkPinned")
         # wenn schwarzer Bishop
         elif (id == 27) | (id == 30):
-            answer, arr = self.figures_black[figure_num].Zug(save_pos[0] + 1, save_pos[1] + 1)
+            answer, arr = self.figures_black[figure_num].Zug(
+                save_pos[0] + 1, save_pos[1] + 1
+            )
             if not answer:
-                answer, arr = self.figures_white[figure_num].Zug(save_pos[0] - 1, save_pos[1] - 1)
+                answer, arr = self.figures_white[figure_num].Zug(
+                    save_pos[0] - 1, save_pos[1] - 1
+                )
             # theoretisch müsste es hier immer true sein
             if answer:
                 if self.checkSchach():
@@ -214,12 +242,12 @@ class Checks:
             # checke bei jeder Position, ob eine Figur darauf steht:
             pos = (arr[i][0], arr[i][1])
             # print(arr[i])
-            if (self.checkLists(pos, False)):
+            if self.checkLists(pos, False):
                 bool = False
                 break
         return bool
 
-########################################################################################################################
+    ########################################################################################################################
     # überprüft die Legitimität des Zuges
     def checkZug(self, schlagen):
         bauer = 0
@@ -231,7 +259,9 @@ class Checks:
                 )
                 bauer = 1
             else:
-                answer, arr = self.figures_white[self.save_figure_num].Zug(self.posX, self.posY)
+                answer, arr = self.figures_white[self.save_figure_num].Zug(
+                    self.posX, self.posY
+                )
         else:
             if 8 > self.save_figure_num:
                 answer, arr = self.figures_black[self.save_figure_num].Zug(
@@ -239,7 +269,9 @@ class Checks:
                 )
                 bauer = 2
             else:
-                answer, arr = self.figures_black[self.save_figure_num].Zug(self.posX, self.posY)
+                answer, arr = self.figures_black[self.save_figure_num].Zug(
+                    self.posX, self.posY
+                )
 
         # gibt erst einen bool wert zurück, dann gibt es 3 Optionen:
         # 1. wenn answer = False, dann soll auch hier sofort false ausgegeben werden
@@ -252,8 +284,10 @@ class Checks:
             # handelt es sich nun um den König, muss geschaut werden, ob die gegnerische Figur aktuell gedeckt wird.
             if (self.saveid == 5) or (self.saveid == 29):
                 if self.checkGedeckt((self.posX, self.posY)):
-                    print("Es handelt sich um den König, die gegnerische Figur wird gedeckt, "
-                          "oder man steht sonst im Schach")
+                    print(
+                        "Es handelt sich um den König, die gegnerische Figur wird gedeckt, "
+                        "oder man steht sonst im Schach"
+                    )
                     return False
             return True
         # 2.2 Ansonsten handelt es sich um einen größeren Zug, bei dem Figuren dazwischen stehen könnten
@@ -270,7 +304,7 @@ class Checks:
                     self.figures_black[self.save_figure_num].moved()
             return bool
 
-########################################################################################################################
+    ########################################################################################################################
     # gibt für das Backtracking die ID zurück und ändert die Position
     def returnID(self, Position, newPos, id):
         # erst soll er nach der Aktiven Figur suchen
@@ -288,45 +322,55 @@ class Checks:
         else:
             for i in range(0, 16):
                 # wenn du eine Figure mit der gleichen Position findest
-                if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
+                if (self.figures_black[i].getPos() == Position) & (
+                    self.figures_black[i].getActive() is True
+                ):
                     id = self.figures_black[i].getID()
                     self.figures_black[i].setPos(newPos[0], newPos[1])
                     return id
-                if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
+                if (self.figures_white[i].getPos() == Position) & (
+                    self.figures_white[i].getActive() is True
+                ):
                     id = self.figures_white[i].getID()
                     self.figures_white[i].setPos(newPos[0], newPos[1])
                     return id
         return None
 
-########################################################################################################################
+    ########################################################################################################################
     # geht die Liste durch und schaut, ob für die Position eine Figur erkannt wurde
     def checkLists(self, Position, Bool):
         # gehe die Listen durch
         for i in range(0, 16):
             # wenn du eine Figure mit der gleichen Position findest
-            if (self.figures_black[i].getPos() == Position) & (self.figures_black[i].getActive() is True):
+            if (self.figures_black[i].getPos() == Position) & (
+                self.figures_black[i].getActive() is True
+            ):
                 if Bool:
                     self.id = self.figures_black[i].getID()
                     self.figure_num = i
                     # print("Schwarze Figur erkannt", self.id)
                 # else:
-                    # print("Figur erkannt")
+                # print("Figur erkannt")
                 return True
-            if (self.figures_white[i].getPos() == Position) & (self.figures_white[i].getActive() is True):
+            if (self.figures_white[i].getPos() == Position) & (
+                self.figures_white[i].getActive() is True
+            ):
                 if Bool:
                     self.id = self.figures_white[i].getID()
                     self.figure_num = i
                     # print("Weiße Figur erkannt", self.id)
                 # else:
-                    #print("Figur erkannt")
+                # print("Figur erkannt")
                 return True
         return False
 
-########################################################################################################################
+    ########################################################################################################################
     # bekommt den neusten Zug und führt sämtliche Berechnungen und Fälle aus
     def checkAll(self, x, y, gui):
         if self.beendet:
-            gui.changeOutput("Das Spiel ist beendet, keine weiteren Zug-Eingaben möglich")
+            gui.changeOutput(
+                "Das Spiel ist beendet, keine weiteren Zug-Eingaben möglich"
+            )
         else:
             self.id = None
             # lade die Listen
@@ -343,12 +387,14 @@ class Checks:
             print("\nStatus:")
 
             # Es folgt das Unterscheiden in 3 mögliche Fälle
-        ################################################################################################################
-        # 1. Eine Figur wurde ausgewählt (kennzeichnend dafür: Es wurde eine ID erkannt und keine alte gespeichert)
+            ################################################################################################################
+            # 1. Eine Figur wurde ausgewählt (kennzeichnend dafür: Es wurde eine ID erkannt und keine alte gespeichert)
 
             if (not self.id is None) & (self.saveid is None):
                 # jetzt schaut er erst einmal, welche Farbe aktuell dran ist und dementsprechend rücken darf
-                if((self.Runde % 2 == 1) & (self.id < 17)) | ((self.Runde%2 == 0) & (self.id > 16)):
+                if ((self.Runde % 2 == 1) & (self.id < 17)) | (
+                    (self.Runde % 2 == 0) & (self.id > 16)
+                ):
                     # Feedback
                     gui.ErrorOff()
                     gui.changeOutput("Klicke auf das Zielfeld")
@@ -360,11 +406,13 @@ class Checks:
                     self.saveid = self.id
                     self.save_figure_num = self.figure_num
                     x, y = self.con.convFiePos(self.posX, self.posY)
-                    self.rect = gui.canvas.create_rectangle(x-28, y-28, x+28, y+28, width=2, outline="#04d9ff")
+                    self.rect = gui.canvas.create_rectangle(
+                        x - 28, y - 28, x + 28, y + 28, width=2, outline="#04d9ff"
+                    )
                     return
                 else:
                     # überprüft, ob falsche Person versucht zu rücken
-                    if(self.Runde % 2 == 1):
+                    if self.Runde % 2 == 1:
                         gui.changeOutput("Weiß ist am Zug, nicht schwarz")
                         gui.ErrorOn()
                     else:
@@ -372,8 +420,8 @@ class Checks:
                         gui.ErrorOn()
                     return
 
-        ################################################################################################################
-        # 2. Eine Figur wird gezogen (kz.: Eine Figur ist gespeichert aber keine neue wurde erkannt)
+            ################################################################################################################
+            # 2. Eine Figur wird gezogen (kz.: Eine Figur ist gespeichert aber keine neue wurde erkannt)
 
             if (self.id is None) & (not self.saveid is None):
                 # Überprüfen, ob der Zug möglich ist
@@ -387,10 +435,14 @@ class Checks:
                     # ändern der Position der gerückten Figur
                     if self.saveid < 17:  # weiße Figur, ändern in der weißen Liste
                         posvor = self.figures_white[self.save_figure_num].getPos()
-                        self.figures_white[self.save_figure_num].setPos(self.posX, self.posY)
+                        self.figures_white[self.save_figure_num].setPos(
+                            self.posX, self.posY
+                        )
                     else:  # schwarze Figur, ändern in der schwarzen Liste
                         posvor = self.figures_black[self.save_figure_num].getPos()
-                        self.figures_black[self.save_figure_num].setPos(self.posX, self.posY)
+                        self.figures_black[self.save_figure_num].setPos(
+                            self.posX, self.posY
+                        )
 
                     # löschen des Markers
                     gui.canvas.delete(self.rect)
@@ -406,7 +458,9 @@ class Checks:
                     self.save_figure_num = None
 
                     # gültigen Zug in Listbox eintragen
-                    gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY, None)
+                    gui.insertItemInList(
+                        posvor[0], posvor[1], self.posX, self.posY, None
+                    )
 
                     # Zug vollendet eine neue Runde Beginnt
                     self.Runde += 1
@@ -418,14 +472,16 @@ class Checks:
 
                 return
 
-        ################################################################################################################
-        # 3. Eine andere Figur wurde ausgewählt (2 extra Fälle: gegner oder eigene Figur)
-        # (kz: Es wurde eine Figur gespeichert und eine neue erkannt)
+            ################################################################################################################
+            # 3. Eine andere Figur wurde ausgewählt (2 extra Fälle: gegner oder eigene Figur)
+            # (kz: Es wurde eine Figur gespeichert und eine neue erkannt)
 
             if (not self.id is None) & (not self.saveid is None):
                 # überprüfe, ob eine eigene andere Figur ausgewählt wurde, in dem Fall wären beide IDs sowohl vorherige,
                 # als auch nachfolgende entweder im Bereich 1 bis 16 oder 17 bis 32
-                if ((self.id < 17) & (self.saveid < 17)) | ((self.id > 16) & (self.saveid > 16)):
+                if ((self.id < 17) & (self.saveid < 17)) | (
+                    (self.id > 16) & (self.saveid > 16)
+                ):
                     gui.changeOutput("Eigene andere Figur")
                     print("Eigene andere Figur erkannt")
 
@@ -434,7 +490,9 @@ class Checks:
 
                     # erstellen des neuen Markers
                     x, y = self.con.convFiePos(self.posX, self.posY)
-                    self.rect = gui.canvas.create_rectangle(x - 28, y - 28, x + 28, y + 28, width=2, outline="#04d9ff")
+                    self.rect = gui.canvas.create_rectangle(
+                        x - 28, y - 28, x + 28, y + 28, width=2, outline="#04d9ff"
+                    )
 
                     # die neue Figur speichern als Ausgangspunkt für den nächsten Klick
                     self.saveid = self.id
@@ -456,10 +514,14 @@ class Checks:
                         # ändern der Position der schlagenden Figur
                         if self.saveid < 17:  # weiße Figur, ändern in der weißen Liste
                             posvor = self.figures_white[self.save_figure_num].getPos()
-                            self.figures_white[self.save_figure_num].setPos(self.posX, self.posY)
+                            self.figures_white[self.save_figure_num].setPos(
+                                self.posX, self.posY
+                            )
                         else:  # schwarze Figur, ändern in der schwarzen Liste
                             posvor = self.figures_black[self.save_figure_num].getPos()
-                            self.figures_black[self.save_figure_num].setPos(self.posX, self.posY)
+                            self.figures_black[self.save_figure_num].setPos(
+                                self.posX, self.posY
+                            )
 
                         # deaktivieren(verkleinern der neuen Figur
                         if self.id < 17:  # weiße Figur, ändern in der weißen Liste
@@ -472,7 +534,9 @@ class Checks:
                         gui.loescheImgofFigur(self.id)
 
                         # gültigen Zug in Listbox eintragen
-                        gui.insertItemInList(posvor[0], posvor[1], self.posX, self.posY, self.id)
+                        gui.insertItemInList(
+                            posvor[0], posvor[1], self.posX, self.posY, self.id
+                        )
                         # Es folgt ein Runden inkrement, da nun gegnerische Farbe antwortet auf vorherigen Zug
                         self.Runde += 1
 
@@ -486,8 +550,8 @@ class Checks:
                         gui.changeOutput("Schlagen nicht möglich")
                     return
             # ID Fehler beim Schlagen bzw der ID Bilder
-        ################################################################################################################
-        # 4. Es wird ein Feld geklickt, aber vorher wurde keine Figur ausgewählt (kz.: Keine gespeichert oder erkannt)
+            ################################################################################################################
+            # 4. Es wird ein Feld geklickt, aber vorher wurde keine Figur ausgewählt (kz.: Keine gespeichert oder erkannt)
 
             if (self.id is None) & (self.saveid is None):
                 gui.changeOutput("Wähle eine Figur aus")

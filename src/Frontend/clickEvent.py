@@ -13,4 +13,3 @@ class ClickEvent:
 
     def tipp(self):
         return self.logic.byStock()
-
