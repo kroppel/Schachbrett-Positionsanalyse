@@ -5,6 +5,12 @@ from stockfish import Stockfish
 
 
 class Logic:
+
+    """
+        Info: Initialize the app's logic, create the necessary basic settings.
+        Params: gui = class gui to execute functions and send information back to the front-end.
+        return: none
+    """
     def __init__(self, gui):
         # init new Game
         self.board = c.Board()
@@ -21,7 +27,14 @@ class Logic:
             parameters={"Threads": 4, "Minimum Thinking Time": 30},
         )
 
-    # input of mouseClick
+    """
+        Info: Depending on whether a click has been detected previously or not, 
+        it either stores the field or checks and possibly executes the move. 
+        It checks whether the move is in the legal array. Depending on the use case and rules, 
+        it triggers the corresponding visual function in the frontend.
+        Params: Mouse coordinates so pixel Position.
+        Return: a value to see if legal or not 
+    """
     def input(self, x, y):
         print("###########\nStatus:")
         print(self.board.unicode())
@@ -127,6 +140,8 @@ class Logic:
 
         return ret_value
 
+
+    ''' Searches in the bibs logic if check- or stalemate occurs '''
     def _checkCheck(self):
         if self.board.is_checkmate():
             print("Schachmatt, Spiel vorbei")
@@ -140,6 +155,11 @@ class Logic:
             print("Schach erkannt")
             self.gui.check("Schach " + self.side)
 
+    """
+        Info: returns color picked is correct one (not chosen wrong side) 
+        Params: the color of the piece
+        return: true or false depending on correct or incorrect 
+    """
     def _checkColor(self, color):
         if (self.round % 2 == 0) and (color == c.WHITE):
             self.side = "Schwarz"
@@ -150,9 +170,12 @@ class Logic:
         else:
             return False
 
+    ''' Checks and returns bool depending on game is finished '''
     def _getFinished(self):
         return self.finished
 
+    ################
+    ''' old min max algorithm implementation (very bad) checking for best next move with highest points '''
     scoring = {
         "p": -1,
         "n": -3,
@@ -178,7 +201,9 @@ class Logic:
 
     def getTipp(self):
         return self.min_maxN(self.board, 3)
+    #################
 
+    ''' using stockfish function to return the best possible move '''
     def byStock(self):
         self.stock.set_fen_position(self.board.fen())
         return self.stock.get_best_move()

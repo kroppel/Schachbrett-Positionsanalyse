@@ -1,7 +1,7 @@
 import Backend.Convert as conv
 import Backend.Figuren as fig
 
-
+''' OLD IMPLEMENTATION of own Logic (not usable) '''
 class Checks:
     def __init__(self):
         self.con = conv.Convert()
