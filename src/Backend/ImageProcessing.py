@@ -4,7 +4,7 @@ import numpy as np
 DEBUG = False
 
 
-"""Preprocess input image with adaptive threshold method to obtain binary image similar to gradient image
+"""Preprocess input image with adaptive threshold method to obtain binary image similar to gradient image.
 
 Params:
     img (np.ndarray): the input image
@@ -42,7 +42,7 @@ Returns:
 """
 
 
-def preprocessingFigures(img):
+def preprocessingFigures(img, lower_black, upper_black, lower_white, upper_white):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
@@ -87,8 +87,19 @@ def resizeImage(img, factor):
     )
 
 
-# Draws the given lines onto a copy of the given image
-# and returns it
+"""Draw a set of lines onto an image.
+
+Params:
+    img (np.ndarray): the input image
+    lines (list): the list of lines to be drawn. Lines must be given in form of a 2-tupel (rho,theta),
+                  where rho specifies the distance of the line from the origin of the image (upper left corner) 
+                  and theta is the angle that is enclosed by the x-axis of the image and the line
+
+Returns:
+    img_lines (np.ndarray): the image with lines drawn onto it
+"""
+
+
 def drawLines(img, lines):
     if lines is None:
         return img
@@ -110,6 +121,17 @@ def drawLines(img, lines):
     return img_lines
 
 
+"""Draw a set of points onto an image.
+
+Params:
+    img (np.ndarray): the input image
+    points (list): the list of points to be drawn. Points must be given in form of a 2-tupel (x,y).
+
+Returns:
+    img_lines (np.ndarray): the image with points drawn onto it
+"""
+
+
 def drawPoints(img, points):
     if points is None:
         return img
@@ -122,16 +144,24 @@ def drawPoints(img, points):
     return img_points
 
 
+"""Extract lines from an image using hough transform. 
+
+Params:
+    img (np.ndarray): the input image
+
+Returns:
+    lines (list): lines found in the image
+"""
+
+
 def extractLines(img):
     # Parameters for setting an interval, in which the number of retrieved lines has to lie
     n = int(
         (img.shape[1] * 0.8) / 8
     )  # n: Pixel size of the field of a figure. Chess Board should fill about 80% of image width
-    max_deviation = 20
 
     lines = []
-    votes_upper_bound = min(img.shape)
-    votes_lower_bound = 0
+    
     min_votes = int(
         min(img.shape) / 3
     )  # Line should have length of at least 1/3 of shortest image side
@@ -144,9 +174,29 @@ def extractLines(img):
     return lines
 
 
-# Filters out irrelevant lines (non-horizontal/non-vertical/duplicate)
+"""Wrapper function that filters lines to retrieve those lines that are part of the chess playing field.
+
+Params:
+    lines (list): the list of lines to be filtered.
+
+Returns:
+    horizontal_lines (list): the list of horizontal lines that where found as part of the chess playing field.
+    vertical_lines (list): the list of vertical lines that where found as part of the chess playing field.
+"""
+
+
 def filterLines(lines):
-    # Removes lines that are neither horizontally nor vertically aligned
+    """Retrieve horizontal and vertical lines out of a list of lines by analyzing their theta value.
+
+    Params:
+        lines (list): the list of input lines.
+
+    Returns:
+        horizontal_lines (list): the list of horizontal lines out of the input list.
+        vertical_lines (list): the list of vertical lines out of the input list.
+    """
+
+
     def getHorizontalAndVerticalLines(lines):
         vertical_lines = []
         horizontal_lines = []
@@ -160,8 +210,18 @@ def filterLines(lines):
 
         return horizontal_lines, vertical_lines
 
-    # Removes lines that are probably duplicates and returns
-    # the remaining ones
+
+    """Remove duplicates out of a list of lines by analyzing their rho and theta value. 
+       Duplicates are lines that have both a similar rho and theta value.
+
+    Params:
+        lines (list): the list of input lines.
+
+    Returns:
+        d_lines (list): the list of lines that contains only non-duplicate lines.
+    """
+
+
     def removeDuplicateLines(lines):
         d_lines = []
         for line in lines:
