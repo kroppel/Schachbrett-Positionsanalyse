@@ -12,8 +12,11 @@ import numpy as np
 import cv2
 from time import sleep
 
-
+''' Class GUI represents the Front End with the visual components and some basic functionality '''
 class GUI:
+
+    """ Initializing the GUI a windows with buttons, text, listbox and canvas elements,
+     along with all the initial values for the start of the game. """
     def __init__(self=None):
         self.abs_path = (
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) + "/img/"
@@ -151,8 +154,14 @@ class GUI:
         # Mainloop starten
         self.root.mainloop()
 
-    ########################################################################################################################
+    ###################################################################################################################
     # Button Functions
+
+    """
+        Info: Activates Stockfish in the backend, passes the board and receives the result. 
+        Param: None
+        Return: draws an arrow and outputs the result and time needed in the Info Textfield at the bottom 
+    """
     def tipp(self):
         self.deleteArrow()
         t1 = int(time.time() * 1000)
@@ -170,6 +179,13 @@ class GUI:
 
         # draw the arrow
         self.drawArrow(x1, y1, x2, y2)
+
+    """
+        Info: Resets the game state, place all pieces in their standard positions and reset the backend,
+        including the chess library and the initial piece recognition configuration. Clears the move list. 
+        Params: None
+        Return: New Game
+    """
 
     def newGame(self):
         self.clickEvent = ClickEvent(self)
@@ -194,6 +210,9 @@ class GUI:
         self.vid.restart(self)
 
     # switcht zwischen großer Ausgabe des Produktes und Optionen um die Farbmasken Einstellunge zu ändern
+
+    ''' Switches between the full camera input display and the options menu 
+    that allows the user to adjust the color masks. '''
     def switchoption(self):
         if self.option:
             self.option = False
@@ -207,6 +226,7 @@ class GUI:
             self.button_option["text"] = "Apply"
             self.vid.switchoption()
 
+    ''' Deletes the option elements and shows the full camera input '''
     def vidn(self):
         self.canvas_vidin.place(x=890, y=200)
         self.vidb.place_forget()
@@ -214,6 +234,7 @@ class GUI:
         self.slider1.place_forget()
         self.slider2.place_forget()
 
+    ''' Deletes the camera input element and shows the option elements '''
     def vido(self):
         self.canvas_vidin.place_forget()
         self.vidb.place(x=880, y=450)
@@ -221,6 +242,12 @@ class GUI:
         self.slider1.place(x=1100, y=200)
         self.slider2.place(x=1100, y=450)
 
+    """
+        Info: Gets the slider Input and changes the color mask to the new selected values. 
+        (w for white, b for black Mask)
+        Params: e = value of slider
+        Return: None
+    """
     def switchw(self, e):
         self.vid.lower_white = np.array([0, 40, int(e)])
 
@@ -229,29 +256,46 @@ class GUI:
 
     ########################################################################################################################
     # VisualFeedback
+
+    """
+        Info: Changes the Output of the text field at the bottom of the left side under the board. 
+        Params: The new String that will be displayed. 
+        Return: None
+    """
     def changeOutput(self, string):
         self.output_text.config(text=string)
 
+    ''' Enables the visual feedback a red line arround the board. Triggered by check or illegal moves'''
     def ErrorOn(self):
         self.canvas.config(highlightbackground="red")
 
+    ''' Clears the red line --> disables visual feedback when error is resolved '''
     def ErrorOff(self):
         self.canvas.config(highlightbackground="#04d9ff")
 
+    """
+        Info: Draws an arrow representing the calculated result fo Stockfishs optimal move. 
+        Params: Start and end point of the arrow 
+        Return: None
+    """
     def drawArrow(self, x1, y1, x2, y2):
         self.arrow = self.canvas.create_line(
             x1, y1, x2, y2, arrow=tk.LAST, fill="green", width=4
         )
 
+    ''' Deletes the drawn arrow after the player moved a piece '''
     def deleteArrow(self):
         if not self.arrow is None:
             self.canvas.delete(self.arrow)
 
-    ########################################################################################################################
+    ####################################################################################################################
+
+    ''' Checks the video input stream for new frames every 15 milliseconds.  '''
     def start(self):
         while True:
             self.root.after(15, self.update())
 
+    ''' Displays new frames in the canvas made for the video input stream. '''
     def update(self):
         ret, frame1, frame2 = self.vid.getFrame()
 
@@ -276,22 +320,43 @@ class GUI:
                 self.photo1 = ImageTk.PhotoImage(image=frame1)
                 self.canvas_vidin.create_image(0, 0, image=self.photo1, anchor=tk.NW)
 
+    """
+        Info: Passes the coordinates of the event mouse click - only on the chessboard - to the backend.
+        Params: e = the coordinates of the clicked pixel. 
+        Return: None
+    """
     def callback(self, e):
         if not self.goBackBool:
             self.clickEvent.on_click(e.x, e.y)
         else:
             print("Fehler")
 
+    """
+        Info: Passes the field position of a detected move to the backend. 
+        Params: Coords of field on chessboard. 
+        Return: Quick feedback that action performed well 
+    """
     def callback_move_detection(self, p):
         p = con.Convert().convFiePos(p[1] + 1, 8 - p[0])
         return self.clickEvent.on_click(p[0], p[1])
 
+    '''returns the figure List --> old custom-coded logic --> not in use anymore'''
     def getfigLists(self):
         return self.fig.getLists()
 
     ####################################################################################################################
-    # Funktionalitäten für die Liste und das vor und Zurückspringen von Zügen.
-    # Wird rein grafisch implementiert. Solange man nicht beim aktuellen Stand zurück ist, wird keine Eingabe akzeptiert
+    # Functionalities for the list and for navigating forward and backward through chess moves.
+    # It is implemented purely graphically. No input is accepted as long as you are not at the current state.
+
+    """
+        Info: Inserts a string encoded based on the move into the li-fo list at the right side of the board. 
+        Figures get saved in an extra array so we have information which piece got deleted or moved. 
+        
+        Params: start = pos of figure before, target = pos of figure after, figure1 = moved figure, 
+        figure2 = saved only if piece is captured 
+        
+        Return: none
+    """
     def insertItemInList(self, start, target, figure1, figure2):
         print("Inserted Pieces", figure1, figure2)
         if start == "cg":
@@ -333,9 +398,19 @@ class GUI:
         self.listakt += 1
         self.my_listbox.yview(tk.END)
 
+    """
+        Info: Returns the element at the end of the list (so first inserted).
+        Params: i = index of list element
+        Return: return element at the 
+    """
     def getListend(self, i):
         return self.my_listbox.get(i)
 
+    ''' Undo the last move to review past moves. 
+    This is achieved by decoding the last inserted string and reversing the move encoded within it. 
+    Gets the involved pieces by an extra array.
+    The game is paused, and new inputs are temporarily disabled, which will result in an error if attempted. 
+    Once the current state is restored, gameplay can resume.'''
     def goBack(self):
         print(self.count)
         # holen uns die Koordinaten vom aktuellen index
@@ -427,6 +502,7 @@ class GUI:
         else:
             self.changeOutput("Zurück nicht möglich")
 
+    ''' Redo the next move until current state is restored.'''
     def goForward(self):
         print(self.count)
         if self.listakt == self.listend:
@@ -477,11 +553,15 @@ class GUI:
                 self.changeOutput("Aktueller Spielstand erreicht")
                 self.ErrorOff()
 
-    def deleteList(self):
-        return
 
     ###################################################################################################################
     # Implementation of the new logic
+
+    """
+        Info: A figure got chosen by player and no error occurred. "
+        Params: pos = chosen figure pos 
+        Return: none
+    """
     def legalPick(self, pos):
         # Field to Pixel Position
         x, y = con.Convert().convFiePos(pos[0], pos[1])
@@ -496,15 +576,22 @@ class GUI:
         )
         return
 
+    ''' Visual feedback when user clicks on an opponents piece (and has not selected his own before). '''
     def illegalColor(self):
         self.ErrorOn()
         self.changeOutput("Diese Farbe ist gerade nicht am Zug")
 
+    ''' Visual feedback when user clicks an empty field. '''
     def illegalPick(self):
         self.ErrorOn()
         self.changeOutput("Keine Figur auf dem Feld")
         return
 
+    """
+        Info: If move was legal the piece gets moved, so img is deleted on old pos and created on new one. 
+        Params: savedPos == old position of figure, pos == target of move, piece = get image by arr id
+        Return: none
+    """
     def legalMove(self, savedPos, pos, piece):
         self.canvas.delete(self.rect)
         self.ErrorOff()
@@ -526,6 +613,11 @@ class GUI:
         print(str(self.img_id[xpos]))
         return
 
+    """
+        Info: Switches the Image Position of the Rook and King based on which side and rook the castling is made.
+        Params: pos == position of the rook, bool = white or black side
+        Return: none
+    """
     def castling(self, pos, bool):
         print("Castling", pos)
         if not self.goBackBool:
@@ -613,6 +705,11 @@ class GUI:
                         250, 30, image=self.img[10]
                     )
 
+    """
+        Info: Deletes the image of the pawn and displays the image of a queen on the position of pawn promotion. 
+        Params: pos = old pawn position, spos = new queen position, bool = black or white side
+        Return: None
+    """
     def pawnPromo(self, spos, pos, bool):
         if not self.goBackBool:
             self.canvas.delete(self.rect)
@@ -651,6 +748,11 @@ class GUI:
                     xspos, yspos, image=self.img[9]
                 )
 
+    """
+        Info: Returns the saved array-image-number of a piece so the right one will get displayed. 
+        Params: The piece type.
+        Return: Array number of image. 
+    """
     def getImg(self, piece):
         match str(piece):
             case "R":
@@ -679,26 +781,32 @@ class GUI:
                 return 11
         print("Error getImg")
 
+    ''' Visual Feedback when the move is illegal. '''
     def illegalMove(self):
         self.ErrorOn()
         self.changeOutput("Zug nicht Möglich")
         return
 
+    ''' Visual Feedback when the king is in check. '''
     def check(self, string):
         self.ErrorOn()
         self.changeOutput(string)
         return
 
+    ''' Visual feedback when checkmate is detected. '''
     def checkMate(self):
         self.ErrorOn()
         self.changeOutput("Schachmatt, Spiel vorbei")
         return
 
+    ''' Visual feedback when a draw is detected. '''
     def staleMate(self):
         self.ErrorOn()
         self.changeOutput("Remis, Spiel vorbei")
         return
 
+    ''' Create all chess pieces on the board;
+    they are addressed by their array position, so [1 1] == A1 as a position on the board. '''
     def createImgs(self):
         self.img = [
             None,  # RookW     0

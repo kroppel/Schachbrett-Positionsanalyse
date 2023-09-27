@@ -1,3 +1,5 @@
+''' Old implementation of saving the data of figures (not usable) '''
+
 class Figuren:
     def __init__(self, id, seite, x, y, value):
         self.id = id
