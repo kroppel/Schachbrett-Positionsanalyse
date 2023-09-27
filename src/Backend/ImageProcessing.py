@@ -235,9 +235,19 @@ def filterLines(lines):
                 d_lines.append(line)
         return d_lines
 
-    # Removes lines that are probably not part of the
-    # chess playing field and returns the remaining ones
-    # (Based on their distance, etc)
+
+    """Retrieve those lines out of the set of lines that are most likely the lines of the chess
+       playing field. The algorithm chooses those 9 consecutive lines out of the set that are most nearly
+       equidistant for each pair of adjacent lines.
+
+    Params:
+        lines (list): the list of input lines.
+
+    Returns:
+        chess_lines (list): the list of lines that are most likely lines of the chess playing field.
+    """
+
+
     def keepChessLines(lines):
         lines.sort()
         chess_lines = lines
@@ -287,8 +297,17 @@ def filterLines(lines):
     return horizontal_lines, vertical_lines
 
 
-# Computes the intersections of each horizontal line
-# with each vertical line
+"""Calculate intersections between 9 horizonal and 9 vertical lines.
+
+Params:
+    h_lines (list): the list of 9 horizontal lines.
+    v_lines (list): the list of 9 vertical lines.
+    
+Returns:
+    intersections (np.ndarray): 9x9 array containing all 81 line intersections.
+"""
+
+
 def getIntersections(h_lines, v_lines):
     if (len(h_lines) != 9) or (len(v_lines) != 9):
         return None
@@ -319,6 +338,18 @@ def getIntersections(h_lines, v_lines):
     return intersections
 
 
+"""Evaluate if a field given by the fields sub-image contains a figure. After pruning the sub-image,
+   the binary images pixels are summed up. If the sum is higher than the detection threshold, a figure
+   is detected.
+
+Params:
+    field (np.ndarray): the extracted sub-image from the field, preprocessed with a color mask.
+    
+Returns:
+     (bool): true if a figure was detected in the field, otherwise false.
+"""
+
+
 def detectFigureInField(field):
     pruning_size = 15
     field_detection_threshold = field.shape[0] * field.shape[1] / 42
@@ -340,6 +371,19 @@ def detectFigureInField(field):
     return False
 
 
+"""Detect the black and white figures in all fields.
+
+Params:
+    fields_black (np.ndarray): array of the sub-images of each field, preprocessed with the
+                               color mask for black figures.
+    fields_white (np.ndarray): array of the sub-images of each field, preprocessed with the
+                               color mask for black figures.
+    
+Returns:
+    figures (np.ndarray): 2x8x8 array representing the figure positions for white and black figures.
+"""
+
+
 def getFiguresInFields(fields_black, fields_white):
     figures = np.zeros((2, fields_black.shape[0], fields_black.shape[1]))
 
@@ -355,11 +399,25 @@ def getFiguresInFields(fields_black, fields_white):
     return figures
 
 
-# State comparison return values:
-# -1 : invalid
-# 0  : no change
-# 1  : figure moved
-# 2  : figure beaten
+"""Compare two figure position arrays (states) by subtracting the last from the current one and
+   analyzing the result.
+
+Params:
+    last_state (np.ndarray): first/old figure positions.
+    current_state (np.ndarray): second/new figure positions.
+    
+Returns:
+     (int): return value indicating the kind of move that has been executed
+            # State comparison return values:
+            # -1 : invalid
+            # 0  : no change
+            # 1  : figure moved
+            # 2  : figure beaten
+            # 3  : rochade
+     (np.ndarray): difference of states
+"""
+
+
 def compareStates(last_state, current_state):
     # detect difference between last state and current state
     diff_state = current_state - last_state
@@ -395,6 +453,18 @@ def compareStates(last_state, current_state):
             print(last_state)
             print(current_state)
         return -1, diff_state
+
+
+"""Depending on the executed move, retrieve the coordinates of moved figure before and after the move.
+
+Params:
+    compare_value (int): compare value describing which move has been executed.
+    diff_state (np.ndarray): difference of two states (before and after the move).
+    
+Returns:
+     (tuple): tuple of the move coordinates, first entry are the coordinates the figure was moved from,
+              second entry are the coordinates the figure was moved to.
+"""
 
 
 def getMoveCoordinates(compare_value, diff_state):
